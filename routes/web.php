@@ -15,8 +15,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('web.basepath');
 
-Route::get('/home', function () {
+Route::get('/{optional?}', function () {
     return view('app');
 });
