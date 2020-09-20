@@ -16,6 +16,17 @@ export default new Router({
             }
         },
         {
+            path: '/users',
+            name: 'users',
+            component: require('./components/modules/user/UserListComponent').default,
+            meta: {
+                breadcrumb: [
+                    { name: 'Home', link: '/home' },
+                    { name: 'Usuarios' }
+                ]
+            }
+        },
+        {
             path: '/clients',
             name: 'clients',
             component: require('./components/modules/client/ClientListComponent').default,

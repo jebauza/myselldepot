@@ -61,10 +61,10 @@
 
                     <li class="nav-header">ADMINISTRACION</li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
+                        <router-link :to="{path: '/users'}" :class="['nav-link', isActive('/users') ? 'active' : '']">
                             <i class="nav-icon fas fa-users"></i>
                             <p>Usuarios</p>
-                        </a>
+                        </router-link>
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link">

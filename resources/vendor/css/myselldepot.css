@@ -39,3 +39,7 @@
     display: block;
     z-index: 7;
 }
+
+.btnWidth {
+    width: 49% !important;
+}
