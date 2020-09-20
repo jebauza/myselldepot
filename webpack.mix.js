@@ -11,5 +11,17 @@ const mix = require('laravel-mix');
  |
  */
 
-mix.js('resources/js/app.js', 'public/js')
-    .sass('resources/sass/app.scss', 'public/css');
+/* mix.js('resources/js/app.js', 'public/js')
+    .sass('resources/sass/app.scss', 'public/css'); */
+
+mix.styles([
+        'resources/vendor/fontawesome/css/all.min.css',
+        'resources/vendor/css/adminlte.min.css',
+        'resources/vendor/css/myselldepot.css',
+    ], 'public/css/template.css')
+    .js('resources/js/app.js', 'public/js') //JQuery, Bootstrap, VueJS
+    .scripts([
+        'resources/vendor/js/adminlte.min.js',
+        'resources/vendor/js/demo.js',
+    ], 'public/js/template.js')
+    .copy('resources/vendor/fontawesome/webfonts', 'public/webfonts');
