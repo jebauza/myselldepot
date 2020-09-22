@@ -2,13 +2,15 @@
 
 namespace App;
 
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
     use Notifiable;
+    use HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -36,4 +38,41 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected $appends = ['fullName'];
+
+    //Attributes
+    function getFullNameAttribute()
+    {
+        return $this->firstname .' '.($this->secondname ?? '').' '. $this->lastname;
+    }
+
+    //Scopes
+    public function scopeEmail($query, $email)
+    {
+        if($email){
+            return $query->where('email', 'like', "%$email%");
+        }
+    }
+
+    public function scopeUserName($query, $username)
+    {
+        if($username){
+            return $query->where('username', 'like', "%$username%");
+        }
+    }
+
+    public function scopeName($query, $name)
+    {
+        if($name){
+            return $query->whereRaw("CONCAT_WS(' ', firstname, secondname, lastname) like '%$name%'");
+        }
+    }
+
+    public function scopeState($query, $state)
+    {
+        if($state){
+            return $query->where('state', $state);
+        }
+    }
 }

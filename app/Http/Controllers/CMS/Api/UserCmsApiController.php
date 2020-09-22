@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\CMS\Api;
 
 use App\Http\Controllers\Controller;
+use App\User;
 use Illuminate\Http\Request;
 
 class UserCmsApiController extends Controller
@@ -12,9 +13,13 @@ class UserCmsApiController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        dd('UserCmsApiController.index');
+        $user = User::email($request->email)->userName($request->username)
+                        ->name($request->name)->state($request->state)
+                        ->orderBy('username')->paginate();
+
+        return $user;
     }
 
     /**
