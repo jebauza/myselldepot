@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers\CMS\Api;
 
-use App\Http\Controllers\Controller;
 use App\User;
+use App\Models\File;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UserStoreUpdateRequest;
 
 class UserCmsApiController extends Controller
 {
+    protected $path;
     /**
      * Display a listing of the resource.
      *
@@ -15,9 +22,9 @@ class UserCmsApiController extends Controller
      */
     public function index(Request $request)
     {
-        $user = User::email($request->email)->userName($request->username)
-                        ->name($request->name)->state($request->state)
-                        ->orderBy('username')->paginate();
+        $user = User::email($request->email)->userName($request->username)->name($request->name)
+                    ->state($request->state)->with('profileImage')->orderBy('username')
+                    ->paginate();
 
         return $user;
     }
@@ -28,9 +35,41 @@ class UserCmsApiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(UserStoreUpdateRequest $request)
     {
-        //
+        $this->path = null;
+        try {
+            $user = DB::transaction(function () use($request){
+                $file = null;
+                if($request->file('image')) {
+                    $image = $request->file('image');
+                    $image_name = Str::random(10).'_'.$image->getClientOriginalName();
+                    $this->path = Storage::putFileAs('public/users', $image, $image_name);
+                    $file = File::create([
+                        'path' => $this->path,
+                        'filename' => $image_name,
+                        'created_by' => 1,
+                        'updated_by' => 1,
+                    ]);
+                }
+
+                $new_user = new User($request->all());
+                $new_user->secondname = $request->secondname ?? null;
+                $new_user->password = Hash::make($request->password);
+                $new_user->file_id = $file ? $file->id : null;
+                $new_user->created_by = 1;
+                $new_user->updated_by = 1;
+                $new_user->save();
+                return $new_user;
+            });
+
+            return response()->json(['msg'=>__('Save successfully'), 'user'=>$user], 200);
+        } catch (\Exception $e) {
+            if($this->path && Storage::exists($this->path)){
+                Storage::delete($this->path);
+            }
+            return response()->json(['msg_error' => $e->getMessage()], 500);
+        }
     }
 
     /**

@@ -5,7 +5,7 @@
 
         <div class="card-header">
             <div class="card-tools">
-                <button @click="openModalAddEdit()" class="btn btn-info btn-sm">
+                <button @click="openModalAddEdit('add')" class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nuevo Usuario</i>
                 </button>
             </div>
@@ -71,7 +71,12 @@
                                 <tbody>
                                     <tr v-for="(user, index) in users.data" :key="user.id">
                                         <td>
-                                            <img src="#" alt="">
+                                            <template>
+                                                <div class="user-block">
+                                                    <img v-if="user.profile_image && user.profile_image.url" :src="user.profile_image.url" :alt="user.username" class="profile-avatar-img img-fluid img-circle">
+                                                    <img v-else src="/img/avatar.png" :alt="user.username" class="profile-avatar-img img-fluid img-circle">
+                                                </div>
+                                            </template>
                                         </td>
                                         <td v-text="user.fullName"></td>
                                         <td v-text="user.email"></td>
@@ -171,8 +176,8 @@ export default {
                 state: '',
             };
         },
-        openModalAddEdit() {
-            this.$refs.userFormAddEdit.showForm();
+        openModalAddEdit(action) {
+            this.$refs.userFormAddEdit.showForm(action);
         }
     },
 

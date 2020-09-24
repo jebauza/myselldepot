@@ -2,6 +2,7 @@
 
 namespace App;
 
+use App\Models\File;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -18,7 +19,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password',
+        'firstname', 'secondname', 'lastname', 'username', 'email'
     ];
 
     /**
@@ -74,5 +75,10 @@ class User extends Authenticatable
         if($state){
             return $query->where('state', $state);
         }
+    }
+
+    public function profileImage()
+    {
+        return $this->belongsTo(File::class, 'file_id', 'id');
     }
 }

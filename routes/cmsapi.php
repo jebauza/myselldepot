@@ -2,10 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['ajax'])->name('cmsapi.')->group(function () {
+Route::middleware('ajax')->name('cmsapi.')->group(function () {
 
     Route::prefix('administration')->group(function () {
-        Route::resource('users', 'CMS\Api\UserCmsApiController');
+        Route::apiResource('users','CMS\Api\UserCmsApiController');
     });
 });
 

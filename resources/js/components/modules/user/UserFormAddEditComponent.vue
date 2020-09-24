@@ -36,21 +36,21 @@
                             </div>
                             <div class="form-group col-md-6 col-lg-4">
                                 <label for="userName" :class="['control-label', errors.username ? 'text-danger' : '']">Usuario</label>
-                                <input v-model="form.username" type="text" :class="['form-control', errors.username ? 'is-invalid' : '']" name="userName" placeholder="Usuario">
+                                <input v-model="form.username" type="text" :class="['form-control', errors.username ? 'is-invalid' : '']" name="userName" placeholder="Usuario" required>
                                 <small v-if="errors.username" class="form-control-feedback text-danger">
                                     {{ errors.username[0] }}
                                 </small>
                             </div>
                             <div class="form-group col-md-6 col-lg-4">
                                 <label for="email" :class="['control-label', errors.email ? 'text-danger' : '']">Correo</label>
-                                <input v-model="form.email" type="email" :class="['form-control', errors.email ? 'is-invalid' : '']" name="email" placeholder="correo">
+                                <input v-model="form.email" type="email" :class="['form-control', errors.email ? 'is-invalid' : '']" name="email" placeholder="correo" required>
                                 <small v-if="errors.email" class="form-control-feedback text-danger">
                                     {{ errors.email[0] }}
                                 </small>
                             </div>
                             <div class="form-group col-md-6 col-lg-4">
                                 <label for="password" :class="['control-label', errors.password ? 'text-danger' : '']">Contraseña</label>
-                                <input v-model="form.password" type="password" :class="['form-control', errors.password ? 'is-invalid' : '']" name="password" placeholder="Contraseña">
+                                <input v-model="form.password" type="password" :class="['form-control', errors.password ? 'is-invalid' : '']" name="password" placeholder="Contraseña" required>
                                 <small v-if="errors.password" class="form-control-feedback text-danger">
                                     {{ errors.password[0] }}
                                 </small>
@@ -58,12 +58,12 @@
 
                             <div class="col-12">
                                 <div class="custom-file">
-                                    <input type="file" @change="getFile" :class="['custom-file-input', errors.file ? 'is-invalid' : '']" id="customFileLangHTML">
-                                    <label :class="['custom-file-label', errors.file ? 'text-danger' : '']" for="customFileLangHTML" data-browse="Elegir Foto">
-                                        {{ (form.file ? form.file.name : 'Selecione Foto') }}
+                                    <input type="file" @change="getFile" :class="['custom-file-input', errors.image ? 'is-invalid' : '']" id="customFileLangHTML">
+                                    <label :class="['custom-file-label', errors.image ? 'text-danger' : '']" for="customFileLangHTML" data-browse="Elegir Foto">
+                                        {{ (form.image ? form.image.name : 'Selecione Foto') }}
                                     </label>
-                                    <small v-if="errors.file" class="form-control-feedback text-danger">
-                                        {{ errors.file[0] }}
+                                    <small v-if="errors.image" class="form-control-feedback text-danger">
+                                        {{ errors.image[0] }}
                                     </small>
                                 </div>
                             </div>
@@ -73,7 +73,7 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="submit" class="btn btn-primary" v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
                     </div>
                 </form>
             </div>
@@ -95,20 +95,36 @@ export default {
                 username: '',
                 email: '',
                 password: '',
-                file: null
+                image: '',
+                id: ''
             },
-            errors: {}
+            errors: {},
+
+            fullscreenLoading: false
         }
     },
     methods: {
-        showForm(action) {
+        showForm(action, user = null) {
             this.modalType = action;
+            if(this.modalType === 'edit' && user) {
+                this.form = {
+                    firstname: user.firstname,
+                    secondname: user.secondname,
+                    lastname: user.lastname,
+                    username: user.username,
+                    email: user.email,
+                    password: '',
+                    image: '',
+                    id: user.id
+                }
+            }
             $('#modalUserFormAddEdit').modal('show');
         },
         getFile(e) {
-            this.form.file = e.target.files[0];
+            this.form.image = e.target.files[0];
         },
         actionStoreUpdate() {
+            this.fullscreenLoading = true;
             switch (this.modalType) {
                 case 'add':
                     this.storeUser();
@@ -117,15 +133,59 @@ export default {
                 case 'edit':
                     console.log('edit');
                     break;
-            
+
                 default:
                     break;
             }
-
-            $('#modalUserFormAddEdit').modal('hide');
         },
         storeUser() {
-            console.log('storeUser');
+            const config = { headers: { 'content-type': 'multipart/form-data' } };
+            let formData = new FormData;
+            for (const property in this.form) {
+                if(property !== 'id') {
+                    formData.append(property, this.form[property]);
+                }
+            }
+
+            const url = 'cmsapi/administration/users';
+            axios.post(url, formData, config)
+            .then(res => {
+                this.fullscreenLoading = false;
+                this.$swal({
+                    title: response.data.msg,
+                    type: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                this.clearForm();
+                $('#modalUserFormAddEdit').modal('hide');
+            })
+            .catch(err => {
+                this.fullscreenLoading = false;
+                if(err.response.data.msg_error)
+                {
+                    this.$swal({
+                        title: 'Error!',
+                        text: err.response.data.msg_error,
+                        type: "error",
+                        confirmButtonColor: 'red',
+                    });
+                }
+                this.errors = err.response.data.errors;
+            })
+        },
+        clearForm() {
+            this.form = {
+                firstname: '',
+                secondname: '',
+                lastname: '',
+                username: '',
+                email: '',
+                password: '',
+                image: '',
+                id: ''
+            };
+            this.errors = {};
         }
     },
 }
