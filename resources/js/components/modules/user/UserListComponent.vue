@@ -5,7 +5,7 @@
 
         <div class="card-header">
             <div class="card-tools">
-                <button class="btn btn-info btn-sm">
+                <button @click="openModalAddEdit()" class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nuevo Usuario</i>
                 </button>
             </div>
@@ -100,13 +100,15 @@
                                     </tr>
                                 </tbody>
                             </table>
-                            <pagination :limit="5" :data="users" @pagination-change-page="getUsers"></pagination>
+                            <pagination :class="'mt-2'" :align="'center'" :limit="5" :data="users" @pagination-change-page="getUsers"></pagination>
                         </div>
                     </div>
                     <div v-else class="alert alert-warning mx-2 text-center" style="margin-top: 18px;">
                         No hay ningún elemento para mostrar
                     </div>
                 </div>
+
+                <user-form-add-edit ref="userFormAddEdit"></user-form-add-edit>
 
             </div>
 
@@ -116,7 +118,10 @@
 </template>
 
 <script>
+import UserFormAddEdit from './UserFormAddEditComponent';
+
 export default {
+    components: {UserFormAddEdit},
     created() {
         this.getUsers();
     },
@@ -166,6 +171,9 @@ export default {
                 state: '',
             };
         },
+        openModalAddEdit() {
+            this.$refs.userFormAddEdit.showForm();
+        }
     },
 
 }
