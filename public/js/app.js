@@ -4149,6 +4149,7 @@ __webpack_require__.r(__webpack_exports__);
       this.modalType = action;
 
       if (this.modalType === 'edit' && user) {
+        this.clearForm();
         this.form = {
           firstname: user.firstname,
           secondname: user.secondname,
@@ -4175,10 +4176,7 @@ __webpack_require__.r(__webpack_exports__);
           break;
 
         case 'edit':
-          console.log('edit');
-          break;
-
-        default:
+          this.updateUser();
           break;
       }
     },
@@ -4198,15 +4196,15 @@ __webpack_require__.r(__webpack_exports__);
         }
       }
 
-      var url = 'cmsapi/administration/users';
+      var url = 'cmsapi/administration/users/store';
       axios.post(url, formData, config).then(function (res) {
         _this.fullscreenLoading = false;
 
         _this.$swal({
-          title: response.data.msg,
+          title: res.data.msg,
           type: "success",
           timer: 1500,
-          showConfirmButton: false
+          showCloseButton: false
         });
 
         _this.clearForm();
@@ -4220,7 +4218,8 @@ __webpack_require__.r(__webpack_exports__);
             title: 'Error!',
             text: err.response.data.msg_error,
             type: "error",
-            confirmButtonColor: 'red'
+            showCloseButton: true,
+            closeButtonColor: 'red'
           });
         }
 
@@ -4239,6 +4238,51 @@ __webpack_require__.r(__webpack_exports__);
         id: ''
       };
       this.errors = {};
+    },
+    updateUser: function updateUser() {
+      var _this2 = this;
+
+      var config = {
+        headers: {
+          'content-type': 'multipart/form-data'
+        }
+      };
+      var formData = new FormData();
+
+      for (var property in this.form) {
+        if (property !== 'id') {
+          formData.append(property, this.form[property]);
+        }
+      }
+
+      var url = "cmsapi/administration/users/".concat(this.form.id, "/update");
+      axios.post(url, formData, config).then(function (res) {
+        _this2.fullscreenLoading = false;
+
+        _this2.$swal({
+          title: res.data.msg,
+          type: "warning",
+          timer: 1500
+        });
+
+        _this2.clearForm();
+
+        $('#modalUserFormAddEdit').modal('hide');
+      })["catch"](function (err) {
+        _this2.fullscreenLoading = false;
+
+        if (err.response.data.msg_error) {
+          _this2.$swal({
+            title: 'Error!',
+            text: err.response.data.msg_error,
+            type: "error",
+            showCloseButton: true,
+            closeButtonColor: 'red'
+          });
+        }
+
+        _this2.errors = err.response.data.errors;
+      });
     }
   }
 });
@@ -4255,6 +4299,10 @@ __webpack_require__.r(__webpack_exports__);
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _UserFormAddEditComponent__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./UserFormAddEditComponent */ "./resources/js/components/modules/user/UserFormAddEditComponent.vue");
+//
+//
+//
+//
 //
 //
 //
@@ -4438,7 +4486,8 @@ __webpack_require__.r(__webpack_exports__);
       };
     },
     openModalAddEdit: function openModalAddEdit(action) {
-      this.$refs.userFormAddEdit.showForm(action);
+      var user = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      this.$refs.userFormAddEdit.showForm(action, user);
     }
   }
 });
@@ -105999,7 +106048,7 @@ var render = function() {
                           type: "password",
                           name: "password",
                           placeholder: "Contraseña",
-                          required: ""
+                          required: _vm.modalType == "add"
                         },
                         domProps: { value: _vm.form.password },
                         on: {
@@ -106471,7 +106520,43 @@ var render = function() {
                                       )
                                 ]),
                                 _vm._v(" "),
-                                _vm._m(2, true)
+                                _c(
+                                  "td",
+                                  [
+                                    _vm._m(2, true),
+                                    _vm._v(" "),
+                                    user.state == "A"
+                                      ? [
+                                          _c(
+                                            "button",
+                                            {
+                                              staticClass:
+                                                "btn btn-flat btn-info btn-xs",
+                                              attrs: { title: "Editar" },
+                                              on: {
+                                                click: function($event) {
+                                                  return _vm.openModalAddEdit(
+                                                    "edit",
+                                                    user
+                                                  )
+                                                }
+                                              }
+                                            },
+                                            [
+                                              _c("i", {
+                                                staticClass: "fas fa-pencil-alt"
+                                              })
+                                            ]
+                                          ),
+                                          _vm._v(" "),
+                                          _vm._m(3, true),
+                                          _vm._v(" "),
+                                          _vm._m(4, true)
+                                        ]
+                                      : [_vm._m(5, true)]
+                                  ],
+                                  2
+                                )
                               ])
                             }),
                             0
@@ -106542,40 +106627,53 @@ var staticRenderFns = [
     var _vm = this
     var _h = _vm.$createElement
     var _c = _vm._self._c || _h
-    return _c("td", [
-      _c(
-        "button",
-        { staticClass: "btn btn-primary btn-xs", attrs: { title: "ver" } },
-        [_c("i", { staticClass: "fas fa-folder" })]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "btn btn-info btn-xs", attrs: { title: "Editar" } },
-        [_c("i", { staticClass: "fas fa-pencil-alt" })]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "btn btn-success btn-xs", attrs: { title: "Permiso" } },
-        [_c("i", { staticClass: "fas fa-key" })]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-danger btn-xs",
-          attrs: { title: "Desactivar" }
-        },
-        [_c("i", { staticClass: "fas fa-trash" })]
-      ),
-      _vm._v(" "),
-      _c(
-        "button",
-        { staticClass: "btn btn-success btn-xs", attrs: { title: "Activar" } },
-        [_c("i", { staticClass: "fas fa-check" })]
-      )
-    ])
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-flat btn-primary btn-xs",
+        attrs: { title: "ver" }
+      },
+      [_c("i", { staticClass: "fas fa-folder" })]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-flat btn-success btn-xs",
+        attrs: { title: "Permiso" }
+      },
+      [_c("i", { staticClass: "fas fa-key" })]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-flat btn-danger btn-xs",
+        attrs: { title: "Desactivar" }
+      },
+      [_c("i", { staticClass: "fas fa-trash" })]
+    )
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c(
+      "button",
+      {
+        staticClass: "btn btn-flat btn-success btn-xs",
+        attrs: { title: "Activar" }
+      },
+      [_c("i", { staticClass: "fas fa-check" })]
+    )
   }
 ]
 render._withStripped = true

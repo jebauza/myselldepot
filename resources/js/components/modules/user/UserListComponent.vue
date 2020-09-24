@@ -86,21 +86,25 @@
                                             <span v-else class="badge badge-danger">Inactivo</span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-primary btn-xs" title="ver">
+                                            <button class="btn btn-flat btn-primary btn-xs" title="ver">
                                                 <i class="fas fa-folder"></i>
                                             </button>
-                                            <button class="btn btn-info btn-xs" title="Editar">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </button>
-                                            <button class="btn btn-success btn-xs" title="Permiso">
-                                                <i class="fas fa-key"></i>
-                                            </button>
-                                            <button class="btn btn-danger btn-xs" title="Desactivar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                            <button class="btn btn-success btn-xs" title="Activar">
-                                                <i class="fas fa-check"></i>
-                                            </button>
+                                            <template v-if="user.state == 'A'">
+                                                <button @click="openModalAddEdit('edit', user)" class="btn btn-flat btn-info btn-xs" title="Editar">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </button>
+                                                <button class="btn btn-flat btn-success btn-xs" title="Permiso">
+                                                    <i class="fas fa-key"></i>
+                                                </button>
+                                                <button class="btn btn-flat btn-danger btn-xs" title="Desactivar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </template>
+                                            <template v-else>
+                                                <button class="btn btn-flat btn-success btn-xs" title="Activar">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                            </template>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -176,8 +180,8 @@ export default {
                 state: '',
             };
         },
-        openModalAddEdit(action) {
-            this.$refs.userFormAddEdit.showForm(action);
+        openModalAddEdit(action, user = null) {
+            this.$refs.userFormAddEdit.showForm(action, user);
         }
     },
 

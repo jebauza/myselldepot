@@ -63,7 +63,7 @@ class UserCmsApiController extends Controller
                 return $new_user;
             });
 
-            return response()->json(['msg'=>__('Save successfully'), 'user'=>$user], 200);
+            return response()->json(['msg'=>__('Save successfully'), 'user'=>$user], 201);
         } catch (\Exception $e) {
             if($this->path && Storage::exists($this->path)){
                 Storage::delete($this->path);
@@ -90,9 +90,54 @@ class UserCmsApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UserStoreUpdateRequest $request, $id)
     {
-        //
+        $this->path = null;
+        if(!$user = User::find($id)){
+            return response()->json(['msg_error' => __('Not found')], 404);
+        }
+
+        try {
+            DB::transaction(function () use($request, $user){
+                $file = $user->profileImage;
+                if($request->file('image')) {
+                    $image = $request->file('image');
+                    $image_name = Str::random(10).'_'.$image->getClientOriginalName();
+                    $this->path = Storage::putFileAs('public/users', $image, $image_name);
+                    if($file) {
+                        if(Storage::exists($file->path)) {
+                            Storage::delete($file->path);
+                        }
+                        $file->fill(['path' => $this->path])->save();
+                    }else {
+                        $file = File::create([
+                            'path' => $this->path,
+                            'filename' => $image_name,
+                            'created_by' => 1,
+                            'updated_by' => 1,
+                        ]);
+                    }
+                }
+
+                $user->firstname = $request->firstname;
+                $user->secondname = $request->secondname ?? null;
+                $user->lastname = $request->lastname;
+                $user->username = $request->username;
+                $user->email = $request->email;
+                if($request->password) {
+                    $user->password = Hash::make($request->password);
+                }
+                $user->file_id = $file ? $file->id : null;
+                $user->save();
+            });
+
+            return response()->json(['msg'=>__('Save successfully'), 'user'=>$user->refresh()], 200);
+        } catch (\Exception $e) {
+            if($this->path && Storage::exists($this->path)){
+                Storage::delete($this->path);
+            }
+            return response()->json(['msg_error' => $e->getMessage()], 500);
+        }
     }
 
     /**

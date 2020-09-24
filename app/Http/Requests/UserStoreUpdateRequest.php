@@ -41,7 +41,7 @@ class UserStoreUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique('users', 'email')->ignore($user_id)
             ],
-            'password' => 'required|string|max:255',
+            'password' => ($user_id ? 'nullable' : 'required') . '|string|min:8|max:255',
             'image' => 'nullable|file',
         ];
     }

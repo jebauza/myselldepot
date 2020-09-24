@@ -50,7 +50,7 @@
                             </div>
                             <div class="form-group col-md-6 col-lg-4">
                                 <label for="password" :class="['control-label', errors.password ? 'text-danger' : '']">Contraseña</label>
-                                <input v-model="form.password" type="password" :class="['form-control', errors.password ? 'is-invalid' : '']" name="password" placeholder="Contraseña" required>
+                                <input v-model="form.password" type="password" :class="['form-control', errors.password ? 'is-invalid' : '']" name="password" placeholder="Contraseña" :required="modalType=='add'">
                                 <small v-if="errors.password" class="form-control-feedback text-danger">
                                     {{ errors.password[0] }}
                                 </small>
@@ -107,6 +107,7 @@ export default {
         showForm(action, user = null) {
             this.modalType = action;
             if(this.modalType === 'edit' && user) {
+                this.clearForm();
                 this.form = {
                     firstname: user.firstname,
                     secondname: user.secondname,
@@ -131,10 +132,7 @@ export default {
                     break;
 
                 case 'edit':
-                    console.log('edit');
-                    break;
-
-                default:
+                    this.updateUser();
                     break;
             }
         },
@@ -147,15 +145,15 @@ export default {
                 }
             }
 
-            const url = 'cmsapi/administration/users';
+            const url = 'cmsapi/administration/users/store';
             axios.post(url, formData, config)
             .then(res => {
                 this.fullscreenLoading = false;
                 this.$swal({
-                    title: response.data.msg,
+                    title: res.data.msg,
                     type: "success",
                     timer: 1500,
-                    showConfirmButton: false
+                    showCloseButton: false
                 });
                 this.clearForm();
                 $('#modalUserFormAddEdit').modal('hide');
@@ -168,11 +166,12 @@ export default {
                         title: 'Error!',
                         text: err.response.data.msg_error,
                         type: "error",
-                        confirmButtonColor: 'red',
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
                     });
                 }
                 this.errors = err.response.data.errors;
-            })
+            });
         },
         clearForm() {
             this.form = {
@@ -186,6 +185,42 @@ export default {
                 id: ''
             };
             this.errors = {};
+        },
+        updateUser() {
+            const config = { headers: { 'content-type': 'multipart/form-data' } };
+            let formData = new FormData;
+            for (const property in this.form) {
+                if(property !== 'id') {
+                    formData.append(property, this.form[property]);
+                }
+            }
+
+            const url = `cmsapi/administration/users/${this.form.id}/update`;
+            axios.post(url, formData, config)
+            .then(res => {
+                this.fullscreenLoading = false;
+                this.$swal({
+                    title: res.data.msg,
+                    type: "warning",
+                    timer: 1500
+                });
+                this.clearForm();
+                $('#modalUserFormAddEdit').modal('hide');
+            })
+            .catch(err => {
+                this.fullscreenLoading = false;
+                if(err.response.data.msg_error)
+                {
+                    this.$swal({
+                        title: 'Error!',
+                        text: err.response.data.msg_error,
+                        type: "error",
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
+                    });
+                }
+                this.errors = err.response.data.errors;
+            });
         }
     },
 }
