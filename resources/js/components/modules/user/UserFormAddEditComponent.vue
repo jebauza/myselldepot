@@ -149,23 +149,62 @@ export default {
             axios.post(url, formData, config)
             .then(res => {
                 this.fullscreenLoading = false;
-                this.$swal({
+                Swal.fire({
                     title: res.data.msg,
-                    type: "success",
+                    icon: "success",
                     timer: 1500,
-                    showCloseButton: false
+                    showConfirmButton: false
                 });
-                this.clearForm();
+                this.$emit('updateUserList', 'add');
                 $('#modalUserFormAddEdit').modal('hide');
+                this.clearForm();
             })
             .catch(err => {
                 this.fullscreenLoading = false;
                 if(err.response.data.msg_error)
                 {
-                    this.$swal({
+                    Swal.fire({
                         title: 'Error!',
                         text: err.response.data.msg_error,
-                        type: "error",
+                        icon: "error",
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
+                    });
+                }
+                this.errors = err.response.data.errors;
+            });
+        },
+        updateUser() {
+            const config = { headers: { 'content-type': 'multipart/form-data' } };
+            let formData = new FormData;
+            for (const property in this.form) {
+                if(property !== 'id') {
+                    formData.append(property, this.form[property]);
+                }
+            }
+
+            const url = `cmsapi/administration/users/${this.form.id}/update`;
+            axios.post(url, formData, config)
+            .then(res => {
+                this.fullscreenLoading = false;
+                Swal.fire({
+                    title: res.data.msg,
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                this.$emit('updateUserList', 'edit');
+                $('#modalUserFormAddEdit').modal('hide');
+                this.clearForm();
+            })
+            .catch(err => {
+                this.fullscreenLoading = false;
+                if(err.response.data.msg_error)
+                {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: err.response.data.msg_error,
+                        icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',
                     });
@@ -186,42 +225,6 @@ export default {
             };
             this.errors = {};
         },
-        updateUser() {
-            const config = { headers: { 'content-type': 'multipart/form-data' } };
-            let formData = new FormData;
-            for (const property in this.form) {
-                if(property !== 'id') {
-                    formData.append(property, this.form[property]);
-                }
-            }
-
-            const url = `cmsapi/administration/users/${this.form.id}/update`;
-            axios.post(url, formData, config)
-            .then(res => {
-                this.fullscreenLoading = false;
-                this.$swal({
-                    title: res.data.msg,
-                    type: "warning",
-                    timer: 1500
-                });
-                this.clearForm();
-                $('#modalUserFormAddEdit').modal('hide');
-            })
-            .catch(err => {
-                this.fullscreenLoading = false;
-                if(err.response.data.msg_error)
-                {
-                    this.$swal({
-                        title: 'Error!',
-                        text: err.response.data.msg_error,
-                        type: "error",
-                        showCloseButton: true,
-                        closeButtonColor: 'red',
-                    });
-                }
-                this.errors = err.response.data.errors;
-            });
-        }
     },
 }
 </script>

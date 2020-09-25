@@ -117,7 +117,7 @@
                     </div>
                 </div>
 
-                <user-form-add-edit ref="userFormAddEdit"></user-form-add-edit>
+                <user-form-add-edit ref="userFormAddEdit" @updateUserList="updateUserList"></user-form-add-edit>
 
             </div>
 
@@ -182,6 +182,9 @@ export default {
         },
         openModalAddEdit(action, user = null) {
             this.$refs.userFormAddEdit.showForm(action, user);
+        },
+        updateUserList(action) {
+            this.getUsers(this.users.current_page ?? 1 );
         }
     },
 

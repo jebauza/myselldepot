@@ -23,8 +23,12 @@ Vue.component('App', require('./components/App.vue').default);
 
 Vue.component('pagination', require('laravel-vue-pagination'));
 
-import VueSweetalert2 from 'vue-sweetalert2';
+/* import VueSweetalert2 from 'vue-sweetalert2';
 Vue.use(VueSweetalert2);
+https://www.digitalocean.com/community/tutorials/vuejs-vue-sweetalert2#installation
+*/
+import Swal from 'sweetalert2';
+window.Swal = Swal;
 
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
