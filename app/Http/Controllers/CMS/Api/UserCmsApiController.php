@@ -140,6 +140,23 @@ class UserCmsApiController extends Controller
         }
     }
 
+    public function setState(Request $request, $id)
+    {
+        $request->validate([
+            'state' => 'required|in:A,I'
+        ]);
+
+        if($user = User::find($id)) {
+            $user->state = $request->state;
+            $user->save();
+            return response()->json(['msg'=>__('User :state successfully', ['state'=>__($user->state == 'A' ? 'activated' : 'deactivated')]), 'user'=>$user], 200);
+        }else {
+            return response()->json(['msg_error' => __('No encontrado')], 404);
+        }
+
+        return response()->json(['msg_error' => __('Internal Server Error')], 500);
+    }
+
     /**
      * Remove the specified resource from storage.
      *

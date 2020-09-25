@@ -229,6 +229,3 @@ export default {
 }
 </script>
 
-<style scope>
-
-</style>

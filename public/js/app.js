@@ -4463,6 +4463,7 @@ __webpack_require__.r(__webpack_exports__);
         email: '',
         state: ''
       },
+      fullscreenLoading: false,
       loaded: false
     };
   },
@@ -4492,10 +4493,44 @@ __webpack_require__.r(__webpack_exports__);
       var user = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
       this.$refs.userFormAddEdit.showForm(action, user);
     },
-    updateUserList: function updateUserList(action) {
+    updateUserList: function updateUserList() {
       var _this$users$current_p;
 
+      var action = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       this.getUsers((_this$users$current_p = this.users.current_page) !== null && _this$users$current_p !== void 0 ? _this$users$current_p : 1);
+    },
+    setUserState: function setUserState(newState, user) {
+      var _this2 = this;
+
+      Swal.fire({
+        title: 'Estas seguro de ' + (newState == 'I' ? 'desactivar' : 'activar') + ' el usuario',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: newState == 'I' ? 'Si, desactivar' : 'Si, activar'
+      }).then(function (result) {
+        if (result.isConfirmed) {
+          _this2.fullscreenLoading = true;
+          var url = "cmsapi/administration/users/".concat(user.id, "/set-state");
+          axios.put(url, {
+            state: newState
+          }).then(function (res) {
+            _this2.fullscreenLoading = false;
+            Swal.fire({
+              title: res.data.msg,
+              icon: "success",
+              timer: 1500,
+              showConfirmButton: false
+            });
+
+            _this2.updateUserList();
+          })["catch"](function (err) {
+            _this2.fullscreenLoading = false;
+            console.log(err.response.data);
+          });
+        }
+      });
     }
   }
 });
@@ -106402,359 +106437,425 @@ var render = function() {
       ])
     ]),
     _vm._v(" "),
-    _c("div", { staticClass: "card-body" }, [
-      _c(
-        "div",
-        { staticClass: "container-fluid" },
-        [
-          _c("div", { staticClass: "card card-info" }, [
-            _vm._m(0),
-            _vm._v(" "),
-            _c("div", { staticClass: "card-body" }, [
-              _c("div", { staticClass: "form-row" }, [
-                _c(
-                  "div",
-                  { staticClass: "form-group col-sm-6 col-md-4 col-lg-3" },
-                  [
-                    _c("label", { staticClass: "control-label" }, [
-                      _vm._v("Nombre")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.searches.name,
-                          expression: "searches.name"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "name",
-                        placeholder: "Nombre"
-                      },
-                      domProps: { value: _vm.searches.name },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.searches, "name", $event.target.value)
-                        }
-                      }
-                    })
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "form-group col-sm-6 col-md-4 col-lg-3" },
-                  [
-                    _c("label", { staticClass: "control-label" }, [
-                      _vm._v("Usuario")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.searches.username,
-                          expression: "searches.username"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "username",
-                        placeholder: "Usuario"
-                      },
-                      domProps: { value: _vm.searches.username },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(
-                            _vm.searches,
-                            "username",
-                            $event.target.value
-                          )
-                        }
-                      }
-                    })
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "form-group col-sm-6 col-md-4 col-lg-3" },
-                  [
-                    _c("label", { staticClass: "control-label" }, [
-                      _vm._v("Correo")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.searches.email,
-                          expression: "searches.email"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "email",
-                        placeholder: "Correo"
-                      },
-                      domProps: { value: _vm.searches.email },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.searches, "email", $event.target.value)
-                        }
-                      }
-                    })
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "form-group col-sm-4 col-md-4 col-lg-2" },
-                  [
-                    _c("label", { staticClass: "control-label" }, [
-                      _vm._v("Estado")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.searches.state,
-                          expression: "searches.state"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "state",
-                        placeholder: "Estado"
-                      },
-                      domProps: { value: _vm.searches.state },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.searches, "state", $event.target.value)
-                        }
-                      }
-                    })
-                  ]
-                ),
-                _vm._v(" "),
-                _c("div", { staticClass: "form-group col-auto mt-4 pt-2" }, [
+    _c(
+      "div",
+      {
+        directives: [
+          {
+            name: "loading",
+            rawName: "v-loading.fullscreen.lock",
+            value: _vm.fullscreenLoading,
+            expression: "fullscreenLoading",
+            modifiers: { fullscreen: true, lock: true }
+          }
+        ],
+        staticClass: "card-body"
+      },
+      [
+        _c(
+          "div",
+          { staticClass: "container-fluid" },
+          [
+            _c("div", { staticClass: "card card-info" }, [
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-body" }, [
+                _c("div", { staticClass: "form-row" }, [
                   _c(
-                    "button",
-                    {
-                      staticClass:
-                        "btn waves-effect waves-light btn-danger float-right",
-                      attrs: { title: "Eliminar Filtros", type: "button" },
-                      on: {
-                        click: function($event) {
-                          return _vm.clearSearches()
+                    "div",
+                    { staticClass: "form-group col-sm-6 col-md-4 col-lg-3" },
+                    [
+                      _c("label", { staticClass: "control-label" }, [
+                        _vm._v("Nombre")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.searches.name,
+                            expression: "searches.name"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "name",
+                          placeholder: "Nombre"
+                        },
+                        domProps: { value: _vm.searches.name },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.searches, "name", $event.target.value)
+                          }
                         }
-                      }
-                    },
-                    [_c("i", { staticClass: "fas fa-filter" })]
-                  )
-                ])
-              ])
-            ])
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "card card-info" }, [
-            _c("div", { staticClass: "card-header" }, [
-              _c("h3", { staticClass: "card-title" }, [
-                _vm._v("Bandeja de Resultados\n                        "),
-                _c(
-                  "span",
-                  {
-                    directives: [
+                      })
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "form-group col-sm-6 col-md-4 col-lg-3" },
+                    [
+                      _c("label", { staticClass: "control-label" }, [
+                        _vm._v("Usuario")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.searches.username,
+                            expression: "searches.username"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "username",
+                          placeholder: "Usuario"
+                        },
+                        domProps: { value: _vm.searches.username },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(
+                              _vm.searches,
+                              "username",
+                              $event.target.value
+                            )
+                          }
+                        }
+                      })
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "form-group col-sm-6 col-md-4 col-lg-3" },
+                    [
+                      _c("label", { staticClass: "control-label" }, [
+                        _vm._v("Correo")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.searches.email,
+                            expression: "searches.email"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "email",
+                          placeholder: "Correo"
+                        },
+                        domProps: { value: _vm.searches.email },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.searches, "email", $event.target.value)
+                          }
+                        }
+                      })
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c(
+                    "div",
+                    { staticClass: "form-group col-sm-4 col-md-4 col-lg-2" },
+                    [
+                      _c("label", { staticClass: "control-label" }, [
+                        _vm._v("Estado")
+                      ]),
+                      _vm._v(" "),
+                      _c("input", {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.searches.state,
+                            expression: "searches.state"
+                          }
+                        ],
+                        staticClass: "form-control",
+                        attrs: {
+                          type: "text",
+                          name: "state",
+                          placeholder: "Estado"
+                        },
+                        domProps: { value: _vm.searches.state },
+                        on: {
+                          input: function($event) {
+                            if ($event.target.composing) {
+                              return
+                            }
+                            _vm.$set(_vm.searches, "state", $event.target.value)
+                          }
+                        }
+                      })
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group col-auto mt-4 pt-2" }, [
+                    _c(
+                      "button",
                       {
-                        name: "show",
-                        rawName: "v-show",
-                        value: _vm.users.total,
-                        expression: "users.total"
-                      }
-                    ],
-                    staticClass: "right badge badge-dark"
-                  },
-                  [_vm._v(_vm._s(_vm.users.total))]
-                )
+                        staticClass:
+                          "btn waves-effect waves-light btn-danger float-right",
+                        attrs: { title: "Eliminar Filtros", type: "button" },
+                        on: {
+                          click: function($event) {
+                            return _vm.clearSearches()
+                          }
+                        }
+                      },
+                      [_c("i", { staticClass: "fas fa-filter" })]
+                    )
+                  ])
+                ])
               ])
             ]),
             _vm._v(" "),
-            _vm.users.data.length
-              ? _c("div", { staticClass: "card-body" }, [
+            _c("div", { staticClass: "card card-info" }, [
+              _c("div", { staticClass: "card-header" }, [
+                _c("h3", { staticClass: "card-title" }, [
+                  _vm._v("Bandeja de Resultados\n                        "),
                   _c(
-                    "div",
-                    { staticClass: "card-body table-responsive" },
-                    [
-                      _c(
-                        "table",
+                    "span",
+                    {
+                      directives: [
                         {
-                          staticClass:
-                            "table table-hover table-head-fixed text-nowrap projects"
-                        },
-                        [
-                          _vm._m(1),
-                          _vm._v(" "),
-                          _c(
-                            "tbody",
-                            _vm._l(_vm.users.data, function(user, index) {
-                              return _c("tr", { key: user.id }, [
-                                _c(
-                                  "td",
-                                  [
-                                    [
-                                      _c("div", { staticClass: "user-block" }, [
-                                        user.profile_image &&
-                                        user.profile_image.url
-                                          ? _c("img", {
-                                              staticClass:
-                                                "profile-avatar-img img-fluid img-circle",
-                                              attrs: {
-                                                src: user.profile_image.url,
-                                                alt: user.username
-                                              }
-                                            })
-                                          : _c("img", {
-                                              staticClass:
-                                                "profile-avatar-img img-fluid img-circle",
-                                              attrs: {
-                                                src: "/img/avatar.png",
-                                                alt: user.username
-                                              }
-                                            })
-                                      ])
-                                    ]
-                                  ],
-                                  2
-                                ),
-                                _vm._v(" "),
-                                _c("td", {
-                                  domProps: {
-                                    textContent: _vm._s(user.fullName)
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("td", {
-                                  domProps: { textContent: _vm._s(user.email) }
-                                }),
-                                _vm._v(" "),
-                                _c("td", {
-                                  domProps: {
-                                    textContent: _vm._s(user.username)
-                                  }
-                                }),
-                                _vm._v(" "),
-                                _c("td", [
-                                  user.state == "A"
-                                    ? _c(
-                                        "span",
-                                        { staticClass: "badge badge-success" },
-                                        [_vm._v("Activo")]
-                                      )
-                                    : _c(
-                                        "span",
-                                        { staticClass: "badge badge-danger" },
-                                        [_vm._v("Inactivo")]
-                                      )
-                                ]),
-                                _vm._v(" "),
-                                _c(
-                                  "td",
-                                  [
-                                    _vm._m(2, true),
-                                    _vm._v(" "),
-                                    user.state == "A"
-                                      ? [
-                                          _c(
-                                            "button",
-                                            {
-                                              staticClass:
-                                                "btn btn-flat btn-info btn-xs",
-                                              attrs: { title: "Editar" },
-                                              on: {
-                                                click: function($event) {
-                                                  return _vm.openModalAddEdit(
-                                                    "edit",
-                                                    user
-                                                  )
-                                                }
-                                              }
-                                            },
-                                            [
-                                              _c("i", {
-                                                staticClass: "fas fa-pencil-alt"
-                                              })
-                                            ]
-                                          ),
-                                          _vm._v(" "),
-                                          _vm._m(3, true),
-                                          _vm._v(" "),
-                                          _vm._m(4, true)
-                                        ]
-                                      : [_vm._m(5, true)]
-                                  ],
-                                  2
-                                )
-                              ])
-                            }),
-                            0
-                          )
-                        ]
-                      ),
-                      _vm._v(" "),
-                      _c("pagination", {
-                        class: "mt-2",
-                        attrs: { align: "center", limit: 5, data: _vm.users },
-                        on: { "pagination-change-page": _vm.getUsers }
-                      })
-                    ],
-                    1
+                          name: "show",
+                          rawName: "v-show",
+                          value: _vm.users.total,
+                          expression: "users.total"
+                        }
+                      ],
+                      staticClass: "right badge badge-dark"
+                    },
+                    [_vm._v(_vm._s(_vm.users.total))]
                   )
                 ])
-              : _c(
-                  "div",
-                  {
-                    staticClass: "alert alert-warning mx-2 text-center",
-                    staticStyle: { "margin-top": "18px" }
-                  },
-                  [
-                    _vm._v(
-                      "\n                    No hay ningún elemento para mostrar\n                "
+              ]),
+              _vm._v(" "),
+              _vm.users.data.length
+                ? _c("div", { staticClass: "card-body" }, [
+                    _c(
+                      "div",
+                      { staticClass: "card-body table-responsive" },
+                      [
+                        _c(
+                          "table",
+                          {
+                            staticClass:
+                              "table table-hover table-head-fixed text-nowrap projects"
+                          },
+                          [
+                            _vm._m(1),
+                            _vm._v(" "),
+                            _c(
+                              "tbody",
+                              _vm._l(_vm.users.data, function(user, index) {
+                                return _c("tr", { key: user.id }, [
+                                  _c(
+                                    "td",
+                                    [
+                                      [
+                                        _c(
+                                          "div",
+                                          { staticClass: "user-block" },
+                                          [
+                                            user.profile_image &&
+                                            user.profile_image.url
+                                              ? _c("img", {
+                                                  staticClass:
+                                                    "profile-avatar-img img-fluid img-circle",
+                                                  attrs: {
+                                                    src: user.profile_image.url,
+                                                    alt: user.username
+                                                  }
+                                                })
+                                              : _c("img", {
+                                                  staticClass:
+                                                    "profile-avatar-img img-fluid img-circle",
+                                                  attrs: {
+                                                    src: "/img/avatar.png",
+                                                    alt: user.username
+                                                  }
+                                                })
+                                          ]
+                                        )
+                                      ]
+                                    ],
+                                    2
+                                  ),
+                                  _vm._v(" "),
+                                  _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(user.fullName)
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(user.email)
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("td", {
+                                    domProps: {
+                                      textContent: _vm._s(user.username)
+                                    }
+                                  }),
+                                  _vm._v(" "),
+                                  _c("td", [
+                                    user.state == "A"
+                                      ? _c(
+                                          "span",
+                                          {
+                                            staticClass: "badge badge-success"
+                                          },
+                                          [_vm._v("Activo")]
+                                        )
+                                      : _c(
+                                          "span",
+                                          { staticClass: "badge badge-danger" },
+                                          [_vm._v("Inactivo")]
+                                        )
+                                  ]),
+                                  _vm._v(" "),
+                                  _c(
+                                    "td",
+                                    [
+                                      _vm._m(2, true),
+                                      _vm._v(" "),
+                                      user.state == "A"
+                                        ? [
+                                            _c(
+                                              "button",
+                                              {
+                                                staticClass:
+                                                  "btn btn-flat btn-info btn-xs",
+                                                attrs: { title: "Editar" },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.openModalAddEdit(
+                                                      "edit",
+                                                      user
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass:
+                                                    "fas fa-pencil-alt"
+                                                })
+                                              ]
+                                            ),
+                                            _vm._v(" "),
+                                            _vm._m(3, true),
+                                            _vm._v(" "),
+                                            _c(
+                                              "button",
+                                              {
+                                                staticClass:
+                                                  "btn btn-flat btn-danger btn-xs",
+                                                attrs: { title: "Desactivar" },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.setUserState(
+                                                      "I",
+                                                      user
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass: "fas fa-trash"
+                                                })
+                                              ]
+                                            )
+                                          ]
+                                        : [
+                                            _c(
+                                              "button",
+                                              {
+                                                staticClass:
+                                                  "btn btn-flat btn-success btn-xs",
+                                                attrs: { title: "Activar" },
+                                                on: {
+                                                  click: function($event) {
+                                                    return _vm.setUserState(
+                                                      "A",
+                                                      user
+                                                    )
+                                                  }
+                                                }
+                                              },
+                                              [
+                                                _c("i", {
+                                                  staticClass: "fas fa-check"
+                                                })
+                                              ]
+                                            )
+                                          ]
+                                    ],
+                                    2
+                                  )
+                                ])
+                              }),
+                              0
+                            )
+                          ]
+                        ),
+                        _vm._v(" "),
+                        _c("pagination", {
+                          class: "mt-2",
+                          attrs: { align: "center", limit: 5, data: _vm.users },
+                          on: { "pagination-change-page": _vm.getUsers }
+                        })
+                      ],
+                      1
                     )
-                  ]
-                )
-          ]),
-          _vm._v(" "),
-          _c("user-form-add-edit", {
-            ref: "userFormAddEdit",
-            on: { updateUserList: _vm.updateUserList }
-          })
-        ],
-        1
-      )
-    ])
+                  ])
+                : _c(
+                    "div",
+                    {
+                      staticClass: "alert alert-warning mx-2 text-center",
+                      staticStyle: { "margin-top": "18px" }
+                    },
+                    [
+                      _vm._v(
+                        "\n                    No hay ningún elemento para mostrar\n                "
+                      )
+                    ]
+                  )
+            ]),
+            _vm._v(" "),
+            _c("user-form-add-edit", {
+              ref: "userFormAddEdit",
+              on: { updateUserList: _vm.updateUserList }
+            })
+          ],
+          1
+        )
+      ]
+    )
   ])
 }
 var staticRenderFns = [
@@ -106810,32 +106911,6 @@ var staticRenderFns = [
         attrs: { title: "Permiso" }
       },
       [_c("i", { staticClass: "fas fa-key" })]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "btn btn-flat btn-danger btn-xs",
-        attrs: { title: "Desactivar" }
-      },
-      [_c("i", { staticClass: "fas fa-trash" })]
-    )
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "btn btn-flat btn-success btn-xs",
-        attrs: { title: "Activar" }
-      },
-      [_c("i", { staticClass: "fas fa-check" })]
     )
   }
 ]

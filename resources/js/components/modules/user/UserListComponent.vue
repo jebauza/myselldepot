@@ -11,7 +11,7 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" v-loading.fullscreen.lock="fullscreenLoading">
             <div class="container-fluid">
 
                 <div class="card card-info">
@@ -96,12 +96,12 @@
                                                 <button class="btn btn-flat btn-success btn-xs" title="Permiso">
                                                     <i class="fas fa-key"></i>
                                                 </button>
-                                                <button class="btn btn-flat btn-danger btn-xs" title="Desactivar">
+                                                <button @click="setUserState('I', user)" class="btn btn-flat btn-danger btn-xs" title="Desactivar">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </template>
                                             <template v-else>
-                                                <button class="btn btn-flat btn-success btn-xs" title="Activar">
+                                                <button @click="setUserState('A', user)" class="btn btn-flat btn-success btn-xs" title="Activar">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </template>
@@ -158,6 +158,7 @@ export default {
                 state: '',
             },
 
+            fullscreenLoading: false,
             loaded: false
         }
     },
@@ -183,8 +184,40 @@ export default {
         openModalAddEdit(action, user = null) {
             this.$refs.userFormAddEdit.showForm(action, user);
         },
-        updateUserList(action) {
+        updateUserList(action = null) {
             this.getUsers(this.users.current_page ?? 1 );
+        },
+        setUserState(newState, user) {
+            Swal.fire({
+                title: 'Estas seguro de ' + (newState == 'I' ? 'desactivar' : 'activar') + ' el usuario',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: (newState == 'I' ? 'Si, desactivar' : 'Si, activar')
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    this.fullscreenLoading = true;
+                    const url = `cmsapi/administration/users/${user.id}/set-state`;
+                    axios.put(url,{
+                        state: newState
+                    })
+                    .then(res => {
+                        this.fullscreenLoading = false;
+                        Swal.fire({
+                            title: res.data.msg,
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false
+                        });
+                        this.updateUserList();
+                    })
+                    .catch(err => {
+                        this.fullscreenLoading = false;
+                        console.log(err.response.data);
+                    })
+                }
+            });
         }
     },
 
