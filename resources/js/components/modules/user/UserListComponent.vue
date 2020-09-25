@@ -86,9 +86,9 @@
                                             <span v-else class="badge badge-danger">Inactivo</span>
                                         </td>
                                         <td>
-                                            <button class="btn btn-flat btn-primary btn-xs" title="ver">
+                                            <router-link :to="{name: 'profile', params: {id: user.id}}" class="btn btn-flat btn-primary btn-xs" title="ver">
                                                 <i class="fas fa-folder"></i>
-                                            </button>
+                                            </router-link>
                                             <template v-if="user.state == 'A'">
                                                 <button @click="openModalAddEdit('edit', user)" class="btn btn-flat btn-info btn-xs" title="Editar">
                                                     <i class="fas fa-pencil-alt"></i>

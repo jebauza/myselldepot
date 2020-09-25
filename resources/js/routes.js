@@ -27,6 +27,19 @@ export default new Router({
             }
         },
         {
+            path: '/users/profile/:id',
+            name: 'profile',
+            component: require('./components/modules/user/UserShowComponent').default,
+            props: true,
+            meta: {
+                breadcrumb: [
+                    { name: 'Home', link: '/home' },
+                    { name: 'Usuarios', link: '/users' },
+                    { name: 'Perfil' }
+                ]
+            }
+        },
+        {
             path: '/clients',
             name: 'clients',
             component: require('./components/modules/client/ClientListComponent').default,

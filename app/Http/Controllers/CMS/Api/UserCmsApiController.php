@@ -78,9 +78,13 @@ class UserCmsApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Request $request, $id)
     {
-        //
+        if($user = User::find($id)) {
+            return $user;
+        }
+
+        return response()->json(['msg_error' => __('Not found')], 404);
     }
 
     /**
@@ -149,7 +153,10 @@ class UserCmsApiController extends Controller
         if($user = User::find($id)) {
             $user->state = $request->state;
             $user->save();
-            return response()->json(['msg'=>__('User :state successfully', ['state'=>__($user->state == 'A' ? 'activated' : 'deactivated')]), 'user'=>$user], 200);
+            return response()->json([
+                'msg'=>__('User :state successfully', ['state'=>__($user->state == 'A' ? 'activated' : 'deactivated')]),
+                'user'=>$user
+            ], 200);
         }else {
             return response()->json(['msg_error' => __('No encontrado')], 404);
         }

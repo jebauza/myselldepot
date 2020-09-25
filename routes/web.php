@@ -19,4 +19,4 @@ Route::get('/', function () {
 
 Route::get('/{optional?}', function () {
     return view('app');
-});
+})->where('optional', '.*');

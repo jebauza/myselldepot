@@ -10,6 +10,7 @@ Route::middleware('ajax')->name('cmsapi.')->group(function () {
             Route::post('/store', 'CMS\Api\UserCmsApiController@store')->name('store');
             Route::post('/{id}/update', 'CMS\Api\UserCmsApiController@update')->name('update');
             Route::put('/{id}/set-state', 'CMS\Api\UserCmsApiController@setState')->name('setState');
+            Route::get('/{id}/show', 'CMS\Api\UserCmsApiController@show')->name('show');
         });
     });
 });
