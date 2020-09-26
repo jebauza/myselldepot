@@ -145,7 +145,7 @@ export default {
                 }
             }
 
-            const url = 'cmsapi/administration/users/store';
+            const url = '/cmsapi/administration/users/store';
             axios.post(url, formData, config)
             .then(res => {
                 this.fullscreenLoading = false;
@@ -183,7 +183,7 @@ export default {
                 }
             }
 
-            const url = `cmsapi/administration/users/${this.form.id}/update`;
+            const url = `/cmsapi/administration/users/${this.form.id}/update`;
             axios.post(url, formData, config)
             .then(res => {
                 this.fullscreenLoading = false;

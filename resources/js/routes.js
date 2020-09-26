@@ -27,9 +27,9 @@ export default new Router({
             }
         },
         {
-            path: '/users/profile/:id',
+            path: '/users/:id/profile/',
             name: 'profile',
-            component: require('./components/modules/user/UserShowComponent').default,
+            component: require('./components/modules/user/UserProfileComponent').default,
             props: true,
             meta: {
                 breadcrumb: [

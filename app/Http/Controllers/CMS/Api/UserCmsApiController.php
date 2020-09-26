@@ -80,7 +80,7 @@ class UserCmsApiController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if($user = User::find($id)) {
+        if($user = User::with('profileImage')->find($id)) {
             return $user;
         }
 

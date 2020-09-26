@@ -198,7 +198,7 @@ export default {
             }).then((result) => {
                 if (result.isConfirmed) {
                     this.fullscreenLoading = true;
-                    const url = `cmsapi/administration/users/${user.id}/set-state`;
+                    const url = `/cmsapi/administration/users/${user.id}/set-state`;
                     axios.put(url,{
                         state: newState
                     })
