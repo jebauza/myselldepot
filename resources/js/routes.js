@@ -40,6 +40,17 @@ export default new Router({
             }
         },
         {
+            path: '/roles',
+            name: 'roles',
+            component: require('./components/modules/role/RoleListComponent.vue').default,
+            meta: {
+                breadcrumb: [
+                    { name: 'Home', link: '/home' },
+                    { name: 'Roles' }
+                ]
+            }
+        },
+        {
             path: '/clients',
             name: 'clients',
             component: require('./components/modules/client/ClientListComponent').default,

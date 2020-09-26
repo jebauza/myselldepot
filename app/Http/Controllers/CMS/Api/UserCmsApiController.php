@@ -22,11 +22,11 @@ class UserCmsApiController extends Controller
      */
     public function index(Request $request)
     {
-        $user = User::email($request->email)->userName($request->username)->name($request->name)
+        $users = User::email($request->email)->userName($request->username)->name($request->name)
                     ->state($request->state)->with('profileImage')->orderBy('username')
                     ->paginate();
 
-        return $user;
+        return $users;
     }
 
     /**

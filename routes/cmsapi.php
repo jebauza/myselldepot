@@ -12,6 +12,13 @@ Route::middleware('ajax')->name('cmsapi.')->group(function () {
             Route::put('/{id}/set-state', 'CMS\Api\UserCmsApiController@setState')->name('setState');
             Route::get('/{id}/show', 'CMS\Api\UserCmsApiController@show')->name('show');
         });
+
+        Route::prefix('roles')->name('roles.')->group(function () {
+            Route::get('/', 'CMS\Api\RoleCmsApiController@index')->name('index');
+            Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->name('store');
+            Route::put('/{id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update');
+        });
+
     });
 });
 
