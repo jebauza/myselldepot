@@ -1,0 +1,10 @@
+{
+    "Internal Server Error": "Error Interno del Servidor",
+    "Session closed successfully": "Sesión cerrada correctamente",
+    "Not found": "No encontrado",
+    "Bad Request": "Solicitud Incorrecta",
+    "Save successfully": "Guardado con éxito",
+    "User :state successfully": "Usuario :state con éxito",
+    "deactivated": "desactivado",
+    "activated": "activado"
+}

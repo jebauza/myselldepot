@@ -56,3 +56,11 @@
     display: block;
     z-index: 7;
 }
+
+.btnWidth {
+    width: 49% !important;
+}
+
+.btnFull {
+    width: 100% !important;
+}
