@@ -81,7 +81,7 @@
                 </div>
 
                 <!-- Modal -->
-                <role-form-add-edit ref="roleFormAddEdit"></role-form-add-edit>
+                <role-form-add-edit ref="roleFormAddEdit" @updateRoleList="updateRoleList"></role-form-add-edit>
 
             </div>
 
@@ -137,8 +137,8 @@ export default {
         openModalAddEdit(action, role = null) {
             this.$refs.roleFormAddEdit.showForm(action, role);
         },
-        updateUserList(action = null) {
-            this.getUsers(this.users.current_page ?? 1 );
+        updateRoleList(action = null) {
+            this.getRoles(this.roles.current_page ?? 1 );
         },
     },
 

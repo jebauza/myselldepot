@@ -11,23 +11,61 @@
                 </div>
                 <form class="needs-validation" v-on:submit.prevent="actionStoreUpdate">
                     <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="card card-info">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Rol</h3>
+                                        </div>
 
-                        <div class="form-row">
-                            <div class="form-group col-12">
-                                <label for="name" :class="['control-label', errors.name ? 'text-danger' : '']">Nombre</label>
-                                <input v-model="form.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" name="name" placeholder="Nombre" required>
-                                <small v-if="errors.name" class="form-control-feedback text-danger">
-                                    {{ errors.name[0] }}
-                                </small>
-                            </div>
-                            <div class="form-group col-12">
-                                <label for="url" :class="['control-label', errors.url ? 'text-danger' : '']">Url</label>
-                                <input v-model="form.url" type="text" :class="['form-control', errors.url ? 'is-invalid' : '']" name="url" placeholder="Url" required>
-                                <small v-if="errors.url" class="form-control-feedback text-danger">
-                                    {{ errors.url[0] }}
-                                </small>
-                            </div>
+                                        <div class="card-body">
+                                            <div class="form-row">
+                                                <div class="form-group col-12">
+                                                    <label for="name" :class="['control-label', errors.name ? 'text-danger' : '']">Nombre</label>
+                                                    <input v-model="form.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" name="name" placeholder="Nombre" required>
+                                                    <small v-if="errors.name" class="form-control-feedback text-danger">
+                                                        {{ errors.name[0] }}
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        </div>
 
+                                    </div>
+                                </div>
+
+                                <div class="col-md-7">
+                                    <div class="card card-info">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Lista de premisos</h3>
+                                        </div>
+
+                                        <div v-if="permissions.length" class="card-body row">
+                                            <div v-if="errors.permissions" class="col-12 alert alert-danger alert-dismissible">
+                                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                                <h6><i class="icon fas fa-ban"></i> {{ errors.permissions[0] }}</h6>
+                                            </div>
+                                            <div v-for="(p, index) in filterPermissions" :key="p.id" class="col-12 col-lg-6 col-xl-4">
+                                                <div class="form-group">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input" type="checkbox" :id="'checkboxPermission-'+(index)" v-model="p.checked">
+                                                        <label :for="'checkboxPermission-'+(index)" class="custom-control-label" style="cursor: pointer">{{ p.display_name }}</label>
+                                                    </div>
+                                                    <!-- <div class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input" type="checkbox" id="customCheckbox2" checked="">
+                                                        <label for="customCheckbox2" class="custom-control-label">Custom Checkbox checked</label>
+                                                    </div> -->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-else class="alert alert-warning mx-2 text-center" style="margin-top: 18px;">
+                                            No hay ningún elemento para mostrar
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
                         </div>
 
                     </div>
@@ -45,15 +83,26 @@
 
 <script>
 export default {
+    mounted() {
+        this.getPermissions();
+    },
+    /* watch: {
+        permissions: {
+            handler: function (after, before) {
+
+            }
+        }
+    }, */
     data() {
         return {
             modalType: 'add',
             form: {
                 name: '',
-                url: '',
                 id: ''
             },
             errors: {},
+            permissions: [],
+            filterPermissions: [],
 
             fullscreenLoading: false
         }
@@ -66,18 +115,59 @@ export default {
             if(this.modalType == 'edit') {
                 this.form = {
                     name: role.name,
-                    url: '',
                     id: role.id
                 };
+                this.getPermissionsByRole(role);
             }
             this.erros = {};
             $('#modalRoleFormAddEdit').modal('show');
+        },
+        getPermissions() {
+            const url = `/cmsapi/administration/permissions`;
+            axios.get(url)
+            .then(res => {
+                this.permissions = res.data;
+                let me = this;
+                me.filterPermissions = [];
+                me.permissions.map((p, index) => {
+                    me.filterPermissions.push({
+                        id: p.id,
+                        name: p.name,
+                        display_name: p.display_name,
+                        checked: false
+                    });
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            })
+        },
+        getPermissionsByRole(role) {
+            const url = `/cmsapi/administration/roles/${role.id}/permissions-by-role`;
+            axios.get(url)
+            .then(res => {
+                const permissionsByRole = res.data;
+                let me = this;
+                me.filterPermissions = [];
+                me.permissions.map((p, index) => {
+                    let checked = permissionsByRole.find( pByRole => pByRole.id === p.id );
+                    me.filterPermissions.push({
+                        id: p.id,
+                        name: p.name,
+                        display_name: p.display_name,
+                        checked: checked ? true : false
+                    });
+                });
+            })
+            .catch(err => {
+                console.error(err);
+            })
         },
         actionStoreUpdate() {
             this.fullscreenLoading = true;
             switch (this.modalType) {
                 case 'add':
-                    //this.storeUser();
+                    this.storeRole();
                     break;
 
                 case 'edit':
@@ -85,17 +175,14 @@ export default {
                     break;
             }
         },
-        /* storeUser() {
-            const config = { headers: { 'content-type': 'multipart/form-data' } };
-            let formData = new FormData;
-            for (const property in this.form) {
-                if(property !== 'id') {
-                    formData.append(property, this.form[property]);
-                }
-            }
-
-            const url = '/cmsapi/administration/users/store';
-            axios.post(url, formData, config)
+        storeRole() {
+            //Obtengo los ids de los permisos asociado al rol
+            let checkedIdPermissions = this.filterPermissions.filter(p_filter => p_filter.checked).map(p_map => p_map.id);
+            const url = '/cmsapi/administration/roles/store';
+            axios.post(url, {
+                name: this.form.name,
+                permissions: checkedIdPermissions
+            })
             .then(res => {
                 this.fullscreenLoading = false;
                 Swal.fire({
@@ -104,8 +191,8 @@ export default {
                     timer: 1500,
                     showConfirmButton: false
                 });
-                this.$emit('updateUserList', 'add');
-                $('#modalUserFormAddEdit').modal('hide');
+                this.$emit('updateRoleList', 'add');
+                $('#modalRoleFormAddEdit').modal('hide');
                 this.clearForm();
             })
             .catch(err => {
@@ -121,9 +208,19 @@ export default {
                     });
                 }
                 this.errors = err.response.data.errors;
+
+                //Buscar los errores de los elementos del array permissions
+                if(!this.errors.permissions && Object.keys(this.errors).length !== 0){
+                    for (let i = 0; i < this.permissions.length; i++) {
+                        if(this.errors.hasOwnProperty(`permissions.${i}`)){
+                            this.errors.permissions = this.errors[`permissions.${i}`];
+                            break;
+                        }
+                    }
+                }
             });
         },
-        updateUser() {
+        /* updateUser() {
             const config = { headers: { 'content-type': 'multipart/form-data' } };
             let formData = new FormData;
             for (const property in this.form) {
@@ -164,7 +261,6 @@ export default {
         clearForm() {
             this.form = {
                 name: '',
-                url: '',
                 id: ''
             };
             this.errors = {};

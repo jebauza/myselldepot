@@ -5,6 +5,8 @@ namespace App\Http\Controllers\CMS\Api;
 use App\Models\Rol;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Spatie\Permission\Models\Permission;
+use App\Http\Requests\RoleStoreUpdateRequest;
 
 class RoleCmsApiController extends Controller
 {
@@ -20,15 +22,23 @@ class RoleCmsApiController extends Controller
         return $roles;
     }
 
+    public function getPermissionsByRole(Request $request)
+    {
+        $permissions = Permission::all();
+        return $permissions;
+    }
+
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(RoleStoreUpdateRequest $request)
     {
-        //
+        $role = Rol::create(['name' => $request->name]);
+        $role->syncPermissions($request->permissions);
+        return response()->json(['msg'=>__('Save successfully'), 'role'=>$role], 201);
     }
 
     /**

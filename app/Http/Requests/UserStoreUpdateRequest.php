@@ -24,7 +24,7 @@ class UserStoreUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $user_id = $this->route('id') ?? null;
+        $user_id = $this->route('user_id') ?? null;
         return [
             'firstname' => 'required|string|max:255',
             'secondname' => 'nullable|string|max:255',
