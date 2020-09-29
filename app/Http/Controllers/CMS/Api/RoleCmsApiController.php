@@ -4,6 +4,8 @@ namespace App\Http\Controllers\CMS\Api;
 
 use App\Models\Rol;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Permission;
 use App\Http\Requests\RoleStoreUpdateRequest;
@@ -22,10 +24,13 @@ class RoleCmsApiController extends Controller
         return $roles;
     }
 
-    public function getPermissionsByRole(Request $request)
+    public function getPermissionsByRole(Request $request, $id)
     {
-        $permissions = Permission::all();
-        return $permissions;
+        if(!$role = Role::find($id)){
+            return response()->json(['msg_error' => __('Not found')], 404);
+        }
+
+        return $role->permissions;
     }
 
     /**
@@ -36,9 +41,19 @@ class RoleCmsApiController extends Controller
      */
     public function store(RoleStoreUpdateRequest $request)
     {
-        $role = Rol::create(['name' => $request->name]);
-        $role->syncPermissions($request->permissions);
-        return response()->json(['msg'=>__('Save successfully'), 'role'=>$role], 201);
+        try {
+            DB::beginTransaction();
+
+            $role = Rol::create(['name' => $request->name]);
+            $role->syncPermissions($request->permissions);
+
+            DB::commit();
+            return response()->json(['msg'=>__('Save successfully'), 'role'=>$role->refresh()], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['msg_error' => $e->getMessage()], 500);
+        }
+
     }
 
     /**
@@ -59,9 +74,25 @@ class RoleCmsApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(RoleStoreUpdateRequest $request, $id)
     {
-        //
+        if(!$role = Role::find($id)){
+            return response()->json(['msg_error' => __('Not found')], 404);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            $role->name = $request->name;
+            $role->save();
+            $role->syncPermissions($request->permissions);
+
+            DB::commit();
+            return response()->json(['msg'=>__('Save successfully'), 'role'=>$role], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['msg_error' => $e->getMessage()], 500);
+        }
     }
 
     /**

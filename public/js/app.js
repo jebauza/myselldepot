@@ -4149,21 +4149,36 @@ __webpack_require__.r(__webpack_exports__);
   methods: {
     showForm: function showForm(action) {
       var role = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
+      this.clearFilterPermissions();
 
       if (this.modalType != action) {
         this.clearForm();
       }
 
+      this.modalType = action;
+
       if (this.modalType == 'edit') {
+        this.getPermissionsByRole(role);
         this.form = {
           name: role.name,
           id: role.id
         };
-        this.getPermissionsByRole(role);
       }
 
       this.erros = {};
       $('#modalRoleFormAddEdit').modal('show');
+    },
+    clearFilterPermissions: function clearFilterPermissions() {
+      var me = this;
+      me.filterPermissions = [];
+      me.permissions.map(function (p, index) {
+        me.filterPermissions.push({
+          id: p.id,
+          name: p.name,
+          display_name: p.display_name,
+          checked: false
+        });
+      });
     },
     getPermissions: function getPermissions() {
       var _this = this;
@@ -4171,16 +4186,8 @@ __webpack_require__.r(__webpack_exports__);
       var url = "/cmsapi/administration/permissions";
       axios.get(url).then(function (res) {
         _this.permissions = res.data;
-        var me = _this;
-        me.filterPermissions = [];
-        me.permissions.map(function (p, index) {
-          me.filterPermissions.push({
-            id: p.id,
-            name: p.name,
-            display_name: p.display_name,
-            checked: false
-          });
-        });
+
+        _this.clearFilterPermissions();
       })["catch"](function (err) {
         console.error(err);
       });
@@ -4217,7 +4224,7 @@ __webpack_require__.r(__webpack_exports__);
           break;
 
         case 'edit':
-          //this.updateUser();
+          this.updateRole();
           break;
       }
     },
@@ -4273,44 +4280,57 @@ __webpack_require__.r(__webpack_exports__);
         }
       });
     },
+    updateRole: function updateRole() {
+      var _this4 = this;
 
-    /* updateUser() {
-        const config = { headers: { 'content-type': 'multipart/form-data' } };
-        let formData = new FormData;
-        for (const property in this.form) {
-            if(property !== 'id') {
-                formData.append(property, this.form[property]);
-            }
-        }
-         const url = `/cmsapi/administration/users/${this.form.id}/update`;
-        axios.post(url, formData, config)
-        .then(res => {
-            this.fullscreenLoading = false;
-            Swal.fire({
-                title: res.data.msg,
-                icon: "success",
-                timer: 1500,
-                showConfirmButton: false
-            });
-            this.$emit('updateUserList', 'edit');
-            $('#modalUserFormAddEdit').modal('hide');
-            this.clearForm();
-        })
-        .catch(err => {
-            this.fullscreenLoading = false;
-            if(err.response.data.msg_error)
-            {
-                Swal.fire({
-                    title: 'Error!',
-                    text: err.response.data.msg_error,
-                    icon: "error",
-                    showCloseButton: true,
-                    closeButtonColor: 'red',
-                });
-            }
-            this.errors = err.response.data.errors;
+      var checkedIdPermissions = this.filterPermissions.filter(function (p_filter) {
+        return p_filter.checked;
+      }).map(function (p_map) {
+        return p_map.id;
+      });
+      var url = "/cmsapi/administration/roles/".concat(this.form.id, "/update");
+      axios.put(url, {
+        name: this.form.name,
+        permissions: checkedIdPermissions
+      }).then(function (res) {
+        _this4.fullscreenLoading = false;
+        Swal.fire({
+          title: res.data.msg,
+          icon: "success",
+          timer: 1500,
+          showConfirmButton: false
         });
-    }, */
+
+        _this4.$emit('updateRoleList', 'add');
+
+        $('#modalRoleFormAddEdit').modal('hide');
+
+        _this4.clearForm();
+      })["catch"](function (err) {
+        _this4.fullscreenLoading = false;
+
+        if (err.response.data.msg_error) {
+          Swal.fire({
+            title: 'Error!',
+            text: err.response.data.msg_error,
+            icon: "error",
+            showCloseButton: true,
+            closeButtonColor: 'red'
+          });
+        }
+
+        _this4.errors = err.response.data.errors; //Buscar los errores de los elementos del array permissions
+
+        if (!_this4.errors.permissions && Object.keys(_this4.errors).length !== 0) {
+          for (var i = 0; i < _this4.permissions.length; i++) {
+            if (_this4.errors.hasOwnProperty("permissions.".concat(i))) {
+              _this4.errors.permissions = _this4.errors["permissions.".concat(i)];
+              break;
+            }
+          }
+        }
+      });
+    },
     clearForm: function clearForm() {
       this.form = {
         name: '',
@@ -4423,8 +4443,6 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -4436,9 +4454,6 @@ __webpack_require__.r(__webpack_exports__);
   watch: {
     'searches.name': function searchesName(newValue, oldValue) {
       this.getRoles();
-    },
-    'searches.url': function searchesUrl(newValue, oldValue) {
-      this.getRoles();
     }
   },
   data: function data() {
@@ -4447,8 +4462,7 @@ __webpack_require__.r(__webpack_exports__);
         data: []
       },
       searches: {
-        name: '',
-        url: ''
+        name: ''
       },
       loaded: false
     };
@@ -4469,8 +4483,7 @@ __webpack_require__.r(__webpack_exports__);
     },
     clearSearches: function clearSearches() {
       this.searches = {
-        name: '',
-        url: ''
+        name: ''
       };
     },
     openModalAddEdit: function openModalAddEdit(action) {
@@ -107082,7 +107095,7 @@ var render = function() {
             _vm._v(" "),
             _c("div", { staticClass: "card-body" }, [
               _c("div", { staticClass: "form-row" }, [
-                _c("div", { staticClass: "form-group col-sm-4 col-md-5 " }, [
+                _c("div", { staticClass: "form-group col-6" }, [
                   _c("label", { staticClass: "control-label" }, [
                     _vm._v("Nombre")
                   ]),
@@ -107113,42 +107126,6 @@ var render = function() {
                     }
                   })
                 ]),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  { staticClass: "form-group col-9 col-sm-6 col-md-6 " },
-                  [
-                    _c("label", { staticClass: "control-label" }, [
-                      _vm._v("Url Amigable")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      directives: [
-                        {
-                          name: "model",
-                          rawName: "v-model",
-                          value: _vm.searches.url,
-                          expression: "searches.url"
-                        }
-                      ],
-                      staticClass: "form-control",
-                      attrs: {
-                        type: "text",
-                        name: "url",
-                        placeholder: "Url Amigable"
-                      },
-                      domProps: { value: _vm.searches.url },
-                      on: {
-                        input: function($event) {
-                          if ($event.target.composing) {
-                            return
-                          }
-                          _vm.$set(_vm.searches, "url", $event.target.value)
-                        }
-                      }
-                    })
-                  ]
-                ),
                 _vm._v(" "),
                 _c("div", { staticClass: "form-group col-auto mt-4 pt-2" }, [
                   _c(
@@ -107212,8 +107189,6 @@ var render = function() {
                             _vm._l(_vm.roles.data, function(role, index) {
                               return _c("tr", { key: role.id }, [
                                 _c("td", [_vm._v(_vm._s(role.name))]),
-                                _vm._v(" "),
-                                _c("td", [_vm._v(_vm._s(role.slug))]),
                                 _vm._v(" "),
                                 _c("td", [
                                   _vm._m(2, true),
@@ -107295,9 +107270,7 @@ var staticRenderFns = [
     var _c = _vm._self._c || _h
     return _c("thead", [
       _c("tr", [
-        _c("th", [_vm._v("Foto")]),
-        _vm._v(" "),
-        _c("th", [_vm._v("Url Amigable")]),
+        _c("th", [_vm._v("Nombre")]),
         _vm._v(" "),
         _c("th", [_vm._v("Acciones")])
       ])

@@ -21,14 +21,14 @@
 
                     <div class="card-body">
                         <div class="form-row">
-                            <div class="form-group col-sm-4 col-md-5 ">
+                            <div class="form-group col-6">
                                 <label class="control-label">Nombre</label>
                                 <input v-model="searches.name" type="text" class="form-control" name="name" placeholder="Nombre">
                             </div>
-                            <div class="form-group col-9 col-sm-6 col-md-6 ">
+                            <!-- <div class="form-group col-9 col-sm-6 col-md-6 ">
                                 <label class="control-label">Url Amigable</label>
                                 <input v-model="searches.url" type="text" class="form-control" name="url" placeholder="Url Amigable">
-                            </div>
+                            </div> -->
                             <div class="form-group col-auto mt-4 pt-2">
                                 <button @click="clearSearches()" title="Eliminar Filtros" type="button"
                                     class="btn waves-effect waves-light btn-danger float-right">
@@ -52,15 +52,13 @@
                             <table class="table table-hover table-head-fixed text-nowrap projects">
                                 <thead>
                                     <tr>
-                                        <th>Foto</th>
-                                        <th>Url Amigable</th>
+                                        <th>Nombre</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(role, index) in roles.data" :key="role.id">
                                         <td>{{ role.name }}</td>
-                                        <td>{{ role.slug }}</td>
                                         <td>
                                             <button class="btn btn-flat btn-primary btn-xs" title="Ver">
                                                 <i class="fas fa-folder"></i>
@@ -101,17 +99,13 @@ export default {
     watch: {
         'searches.name': function (newValue, oldValue) {
             this.getRoles();
-        },
-        'searches.url': function (newValue, oldValue) {
-            this.getRoles();
         }
     },
     data() {
         return {
             roles: {data:[]},
             searches: {
-                name: '',
-                url: ''
+                name: ''
             },
 
             loaded: false
@@ -131,7 +125,6 @@ export default {
         clearSearches() {
             this.searches = {
                 name: '',
-                url: '',
             };
         },
         openModalAddEdit(action, role = null) {

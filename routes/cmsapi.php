@@ -21,6 +21,7 @@ Route::middleware('ajax')->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\RoleCmsApiController@index')->name('index');
             Route::get('/{role_id}/permissions-by-role', 'CMS\Api\RoleCmsApiController@getPermissionsByRole')->name('get-permissions-by-role');
             Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->name('store');
+            Route::put('/{role_id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update');
             /* Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->name('store');
             Route::put('/{id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update'); */
         });

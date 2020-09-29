@@ -109,34 +109,39 @@ export default {
     },
     methods: {
         showForm(action, role = null) {
+            this.clearFilterPermissions()
             if(this.modalType != action) {
                 this.clearForm();
             }
+            this.modalType = action;
             if(this.modalType == 'edit') {
+                this.getPermissionsByRole(role);
                 this.form = {
                     name: role.name,
                     id: role.id
                 };
-                this.getPermissionsByRole(role);
             }
             this.erros = {};
             $('#modalRoleFormAddEdit').modal('show');
+        },
+        clearFilterPermissions() {
+            let me = this;
+            me.filterPermissions = [];
+            me.permissions.map((p, index) => {
+                me.filterPermissions.push({
+                    id: p.id,
+                    name: p.name,
+                    display_name: p.display_name,
+                    checked: false
+                });
+            });
         },
         getPermissions() {
             const url = `/cmsapi/administration/permissions`;
             axios.get(url)
             .then(res => {
                 this.permissions = res.data;
-                let me = this;
-                me.filterPermissions = [];
-                me.permissions.map((p, index) => {
-                    me.filterPermissions.push({
-                        id: p.id,
-                        name: p.name,
-                        display_name: p.display_name,
-                        checked: false
-                    });
-                });
+                this.clearFilterPermissions();
             })
             .catch(err => {
                 console.error(err);
@@ -171,7 +176,7 @@ export default {
                     break;
 
                 case 'edit':
-                    //this.updateUser();
+                    this.updateRole();
                     break;
             }
         },
@@ -220,18 +225,13 @@ export default {
                 }
             });
         },
-        /* updateUser() {
-            const config = { headers: { 'content-type': 'multipart/form-data' } };
-            let formData = new FormData;
-            for (const property in this.form) {
-                if(property !== 'id') {
-                    formData.append(property, this.form[property]);
-                }
-            }
-
-            const url = `/cmsapi/administration/users/${this.form.id}/update`;
-            axios.post(url, formData, config)
-            .then(res => {
+        updateRole() {
+            let checkedIdPermissions = this.filterPermissions.filter(p_filter => p_filter.checked).map(p_map => p_map.id);
+            const url = `/cmsapi/administration/roles/${this.form.id}/update`;
+            axios.put(url, {
+                name: this.form.name,
+                permissions: checkedIdPermissions
+            }).then(res => {
                 this.fullscreenLoading = false;
                 Swal.fire({
                     title: res.data.msg,
@@ -239,8 +239,8 @@ export default {
                     timer: 1500,
                     showConfirmButton: false
                 });
-                this.$emit('updateUserList', 'edit');
-                $('#modalUserFormAddEdit').modal('hide');
+                this.$emit('updateRoleList', 'add');
+                $('#modalRoleFormAddEdit').modal('hide');
                 this.clearForm();
             })
             .catch(err => {
@@ -256,8 +256,18 @@ export default {
                     });
                 }
                 this.errors = err.response.data.errors;
+
+                //Buscar los errores de los elementos del array permissions
+                if(!this.errors.permissions && Object.keys(this.errors).length !== 0){
+                    for (let i = 0; i < this.permissions.length; i++) {
+                        if(this.errors.hasOwnProperty(`permissions.${i}`)){
+                            this.errors.permissions = this.errors[`permissions.${i}`];
+                            break;
+                        }
+                    }
+                }
             });
-        }, */
+        },
         clearForm() {
             this.form = {
                 name: '',
