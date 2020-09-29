@@ -60,8 +60,8 @@
                                     <tr v-for="(role, index) in roles.data" :key="role.id">
                                         <td>{{ role.name }}</td>
                                         <td>
-                                            <button class="btn btn-flat btn-primary btn-xs" title="Ver">
-                                                <i class="fas fa-folder"></i>
+                                            <button @click="openModalAddEdit('show', role)" class="btn btn-flat btn-primary btn-xs" title="Ver">
+                                                <i class="fas fa-eye"></i>
                                             </button>
                                             <button @click="openModalAddEdit('edit', role)" class="btn btn-flat btn-info btn-xs" title="Editar">
                                                     <i class="fas fa-pencil-alt"></i>

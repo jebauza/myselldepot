@@ -4122,6 +4122,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   mounted: function mounted() {
     this.getPermissions();
@@ -4157,7 +4158,7 @@ __webpack_require__.r(__webpack_exports__);
 
       this.modalType = action;
 
-      if (this.modalType == 'edit') {
+      if (this.modalType == 'edit' || this.modalType == 'show') {
         this.getPermissionsByRole(role);
         this.form = {
           name: role.name,
@@ -106679,9 +106680,11 @@ var render = function() {
                 ? _c("h4", { staticClass: "modal-title" }, [
                     _vm._v("Nuevo Rol")
                   ])
-                : _c("h4", { staticClass: "modal-title" }, [
+                : _vm.modalType == "edit"
+                ? _c("h4", { staticClass: "modal-title" }, [
                     _vm._v("Editar Rol")
-                  ]),
+                  ])
+                : _c("h4", { staticClass: "modal-title" }, [_vm._v("Ver Rol")]),
               _vm._v(" "),
               _vm._m(0)
             ]),
@@ -106737,7 +106740,8 @@ var render = function() {
                                     type: "text",
                                     name: "name",
                                     placeholder: "Nombre",
-                                    required: ""
+                                    required: "",
+                                    disabled: _vm.modalType == "show"
                                   },
                                   domProps: { value: _vm.form.name },
                                   on: {
@@ -106858,7 +106862,9 @@ var render = function() {
                                                     type: "checkbox",
                                                     id:
                                                       "checkboxPermission-" +
-                                                      index
+                                                      index,
+                                                    disabled:
+                                                      _vm.modalType == "show"
                                                   },
                                                   domProps: {
                                                     checked: Array.isArray(
@@ -106963,7 +106969,17 @@ var render = function() {
                 _vm._v(" "),
                 _c(
                   "div",
-                  { staticClass: "modal-footer justify-content-between" },
+                  {
+                    directives: [
+                      {
+                        name: "show",
+                        rawName: "v-show",
+                        value: _vm.modalType != "show",
+                        expression: "modalType != 'show'"
+                      }
+                    ],
+                    staticClass: "modal-footer justify-content-between"
+                  },
                   [
                     _c(
                       "button",
@@ -107191,7 +107207,23 @@ var render = function() {
                                 _c("td", [_vm._v(_vm._s(role.name))]),
                                 _vm._v(" "),
                                 _c("td", [
-                                  _vm._m(2, true),
+                                  _c(
+                                    "button",
+                                    {
+                                      staticClass:
+                                        "btn btn-flat btn-primary btn-xs",
+                                      attrs: { title: "Ver" },
+                                      on: {
+                                        click: function($event) {
+                                          return _vm.openModalAddEdit(
+                                            "show",
+                                            role
+                                          )
+                                        }
+                                      }
+                                    },
+                                    [_c("i", { staticClass: "fas fa-eye" })]
+                                  ),
                                   _vm._v(" "),
                                   _c(
                                     "button",
@@ -107275,19 +107307,6 @@ var staticRenderFns = [
         _c("th", [_vm._v("Acciones")])
       ])
     ])
-  },
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c(
-      "button",
-      {
-        staticClass: "btn btn-flat btn-primary btn-xs",
-        attrs: { title: "Ver" }
-      },
-      [_c("i", { staticClass: "fas fa-folder" })]
-    )
   }
 ]
 render._withStripped = true
@@ -108197,11 +108216,7 @@ var render = function() {
                                             title: "ver"
                                           }
                                         },
-                                        [
-                                          _c("i", {
-                                            staticClass: "fas fa-folder"
-                                          })
-                                        ]
+                                        [_c("i", { staticClass: "fas fa-eye" })]
                                       ),
                                       _vm._v(" "),
                                       user.state == "A"

@@ -4,7 +4,8 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h4 v-if="modalType=='add'" class="modal-title">Nuevo Rol</h4>
-                    <h4 v-else class="modal-title">Editar Rol</h4>
+                    <h4 v-else-if="modalType=='edit'" class="modal-title">Editar Rol</h4>
+                    <h4 v-else class="modal-title">Ver Rol</h4>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">×</span>
                     </button>
@@ -23,7 +24,7 @@
                                             <div class="form-row">
                                                 <div class="form-group col-12">
                                                     <label for="name" :class="['control-label', errors.name ? 'text-danger' : '']">Nombre</label>
-                                                    <input v-model="form.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" name="name" placeholder="Nombre" required>
+                                                    <input v-model="form.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" name="name" placeholder="Nombre" required :disabled="modalType=='show'">
                                                     <small v-if="errors.name" class="form-control-feedback text-danger">
                                                         {{ errors.name[0] }}
                                                     </small>
@@ -48,7 +49,7 @@
                                             <div v-for="(p, index) in filterPermissions" :key="p.id" class="col-12 col-lg-6 col-xl-4">
                                                 <div class="form-group">
                                                     <div class="custom-control custom-checkbox">
-                                                        <input class="custom-control-input" type="checkbox" :id="'checkboxPermission-'+(index)" v-model="p.checked">
+                                                        <input class="custom-control-input" type="checkbox" :id="'checkboxPermission-'+(index)" v-model="p.checked" :disabled="modalType=='show'">
                                                         <label :for="'checkboxPermission-'+(index)" class="custom-control-label" style="cursor: pointer">{{ p.display_name }}</label>
                                                     </div>
                                                     <!-- <div class="custom-control custom-checkbox">
@@ -69,7 +70,7 @@
                         </div>
 
                     </div>
-                    <div class="modal-footer justify-content-between">
+                    <div v-show="modalType != 'show'" class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn btn-primary" v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
                     </div>
@@ -114,7 +115,7 @@ export default {
                 this.clearForm();
             }
             this.modalType = action;
-            if(this.modalType == 'edit') {
+            if(this.modalType == 'edit' || this.modalType == 'show') {
                 this.getPermissionsByRole(role);
                 this.form = {
                     name: role.name,
