@@ -4,6 +4,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('ajax')->name('cmsapi.')->group(function () {
 
+    Route::prefix('auth')->name('auth.')->group(function () {
+        Route::post('/login', 'CMS\Api\Auth\LoginCmsApiController@login')->name('login');
+        Route::get('/logout', 'CMS\Api\Auth\LoginCmsApiController@logout')->name('logout');
+    });
+
     Route::prefix('administration')->group(function () {
         Route::prefix('users')->name('user.')->group(function () {
             Route::get('/', 'CMS\Api\UserCmsApiController@index')->name('index');

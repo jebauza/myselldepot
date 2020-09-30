@@ -6,6 +6,11 @@ Vue.use(Router);
 export default new Router({
     routes: [
         {
+            path: '/login',
+            name: 'login',
+            component: require('./components/modules/authenticate/LoginComponent').default
+        },
+        {
             path: '/home',
             name: 'home',
             component: require('./components/dashboard/HomeComponent').default,

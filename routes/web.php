@@ -17,6 +17,14 @@ Route::get('/', function () {
     return view('welcome');
 })->name('web.basepath');
 
-Route::get('/{optional?}', function () {
+
+Route::get('/{optional?}', function ($optional) {
+
+    if($optional === 'login' && auth()->check()){
+        return redirect('home');
+    }else if($optional !== 'login' && !auth()->check()){
+        return redirect('login');
+    }
+
     return view('app');
 })->where('optional', '.*');

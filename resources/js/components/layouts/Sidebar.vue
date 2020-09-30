@@ -19,6 +19,14 @@
                 </div>
             </div>
 
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="info">
+                    <a href="#" class="d-block" @click.prevent="logout" v-loading.fullscreen.lock="fullscreenLoading">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sección
+                    </a>
+                </div>
+            </div>
+
             <!-- Sidebar Menu -->
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact"
@@ -98,9 +106,25 @@
 <script>
 export default {
     props: ['basepath'],
+    data() {
+        return {
+            fullscreenLoading: false
+        }
+    },
     methods: {
         isActive(path_url) {
             return this.currentPage.indexOf(path_url) === 0;
+        },
+        logout() {
+            this.fullscreenLoading = true;
+            const url = '/cmsapi/auth/logout';
+            axios.get(url)
+            .then(res => {
+                window.location.href = '/login';
+                //this.fullscreenLoading = false;
+                /* this.$router.push({name: 'login'});
+                location.reload(); */
+            });
         }
     },
     computed: {
