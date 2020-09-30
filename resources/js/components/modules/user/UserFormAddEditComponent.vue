@@ -68,8 +68,64 @@
                                 </div>
                             </div>
 
-                        </div>
+                            <div class="col-12 mt-3">
+                                <div class="card card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Roles y permisos</h3>
 
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                                            </button>
+                                            <!-- <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i>
+                                            </button> -->
+                                        </div>
+                                    </div>
+
+                                    <div class="card-body" style="display: block;">
+                                        <div class="form-row">
+                                            <div class="col-md-6 form-group">
+                                                <label for="roles" :class="['control-label', errors.roles ? 'text-danger' : '']">Roles</label>
+                                                <!-- <input type="text" :class="['form-control', errors.roles ? 'is-invalid' : '']" name="roles" placeholder="Roles"> -->
+                                                <multiselect
+                                                    v-model="form.roles"
+                                                    :options="allRoles"
+                                                    placeholder="Roles"
+                                                    label="name"
+                                                    track-by="id"
+                                                    :multiple="true"
+                                                    :close-on-select="false"
+                                                    :clear-on-select="false"
+                                                    :preserve-search="true"
+                                                    >
+                                                </multiselect>
+                                                <small v-if="errors.roles" class="form-control-feedback text-danger">
+                                                    {{ errors.roles[0] }}
+                                                </small>
+                                            </div>
+                                            <div class="form-group col-md-6">
+                                                <label for="permissions" :class="['control-label', errors.permissions ? 'text-danger' : '']">Permisos</label>
+                                                <multiselect
+                                                    v-model="form.permissions"
+                                                    :options="allPermissions"
+                                                    placeholder="Permisos"
+                                                    label="display_name"
+                                                    track-by="id"
+                                                    :multiple="true"
+                                                    :close-on-select="false"
+                                                    :clear-on-select="false"
+                                                    :preserve-search="true">
+                                                </multiselect>
+                                                <small v-if="errors.permissions" class="form-control-feedback text-danger">
+                                                    {{ errors.permissions[0] }}
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
@@ -84,10 +140,19 @@
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect';
+
 export default {
+    components: {Multiselect},
+    mounted() {
+        this.getAllRoles();
+        this.getAllPermissions();
+    },
     data() {
         return {
             modalType: 'add', //add, edit
+            allRoles: [],
+            allPermissions: [],
             form: {
                 firstname: '',
                 secondname: '',
@@ -96,6 +161,8 @@ export default {
                 email: '',
                 password: '',
                 image: '',
+                roles: [],
+                permissions: [],
                 id: ''
             },
             errors: {},
@@ -105,9 +172,11 @@ export default {
     },
     methods: {
         showForm(action, user = null) {
+            if(this.modalType != action) {
+                this.clearForm();
+            }
             this.modalType = action;
             if(this.modalType === 'edit' && user) {
-                this.clearForm();
                 this.form = {
                     firstname: user.firstname,
                     secondname: user.secondname,
@@ -116,9 +185,12 @@ export default {
                     email: user.email,
                     password: '',
                     image: '',
+                    roles: user.roles,
+                    permissions: user.permissions,
                     id: user.id
                 }
             }
+            this.erros = {};
             $('#modalUserFormAddEdit').modal('show');
         },
         getFile(e) {
@@ -141,7 +213,14 @@ export default {
             let formData = new FormData;
             for (const property in this.form) {
                 if(property !== 'id') {
-                    formData.append(property, this.form[property]);
+                    if(property === 'roles' || property === 'permissions'){
+                        let arr_ids = this.form[property].map(item => item.id);
+                        for (let i = 0; i < arr_ids.length; i++) {
+                            formData.append(property+'[]', arr_ids[i]);
+                        }
+                    }else{
+                        formData.append(property, this.form[property]);
+                    }
                 }
             }
 
@@ -172,6 +251,7 @@ export default {
                     });
                 }
                 this.errors = err.response.data.errors;
+                this.errorsRolesPermissions();
             });
         },
         updateUser() {
@@ -179,7 +259,14 @@ export default {
             let formData = new FormData;
             for (const property in this.form) {
                 if(property !== 'id') {
-                    formData.append(property, this.form[property]);
+                    if(property === 'roles' || property === 'permissions'){
+                        let arr_ids = this.form[property].map(item => item.id);
+                        for (let i = 0; i < arr_ids.length; i++) {
+                            formData.append(property+'[]', arr_ids[i]);
+                        }
+                    }else{
+                        formData.append(property, this.form[property]);
+                    }
                 }
             }
 
@@ -210,6 +297,7 @@ export default {
                     });
                 }
                 this.errors = err.response.data.errors;
+                this.errorsRolesPermissions();
             });
         },
         clearForm() {
@@ -221,11 +309,56 @@ export default {
                 email: '',
                 password: '',
                 image: '',
+                roles: [],
+                permissions: [],
                 id: ''
             };
             this.errors = {};
         },
+        getAllRoles() {
+            const url = '/cmsapi/administration/roles/get-all-roles';
+            axios.get(url)
+            .then(res => {
+                this.allRoles = res.data;
+            })
+            .catch(err => {
+                console.error(err);
+            })
+        },
+        getAllPermissions() {
+            const url = '/cmsapi/administration/permissions/get-all-permissions';
+            axios.get(url)
+            .then(res => {
+                this.allPermissions = res.data;
+            })
+            .catch(err => {
+                console.error(err);
+            })
+        },
+        errorsRolesPermissions() {
+            //Buscar los errores de los elementos del array permissions
+            if(Object.keys(this.errors).length !== 0){
+                if(!this.errors.roles){
+                    for (let i = 0; i < this.allRoles.length; i++) {
+                        if(this.errors.hasOwnProperty(`roles.${i}`)){
+                            this.errors.roles = this.errors[`roles.${i}`];
+                            break;
+                        }
+                    }
+                }
+                if(!this.errors.permissions){
+                    for (let i = 0; i < this.allPermissions.length; i++) {
+                        if(this.errors.hasOwnProperty(`permissions.${i}`)){
+                            this.errors.permissions = this.errors[`permissions.${i}`];
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     },
 }
 </script>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 

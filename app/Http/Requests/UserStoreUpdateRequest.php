@@ -24,7 +24,7 @@ class UserStoreUpdateRequest extends FormRequest
      */
     public function rules()
     {
-        $user_id = $this->route('id') ?? null;
+        $user_id = $this->route('user_id') ?? null;
         return [
             'firstname' => 'required|string|max:255',
             'secondname' => 'nullable|string|max:255',
@@ -43,6 +43,10 @@ class UserStoreUpdateRequest extends FormRequest
             ],
             'password' => ($user_id ? 'nullable' : 'required') . '|string|min:8|max:255',
             'image' => 'nullable|file',
+            'roles' => 'array',
+            'roles.*' => 'integer|exists:roles,id',
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
         ];
     }
 }
