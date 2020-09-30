@@ -18,4 +18,12 @@ class PermissionCmsApiController extends Controller
         $permissions = Permission::all();
         return $permissions;
     }
+
+    public function getAllPermissions()
+    {
+        $permissions = Permission::orderBy('name')->get();
+        return $permissions;
+    }
+
+
 }

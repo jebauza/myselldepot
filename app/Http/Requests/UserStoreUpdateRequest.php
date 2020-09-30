@@ -43,6 +43,10 @@ class UserStoreUpdateRequest extends FormRequest
             ],
             'password' => ($user_id ? 'nullable' : 'required') . '|string|min:8|max:255',
             'image' => 'nullable|file',
+            'roles' => 'array',
+            'roles.*' => 'integer|exists:roles,id',
+            'permissions' => 'array',
+            'permissions.*' => 'integer|exists:permissions,id',
         ];
     }
 }

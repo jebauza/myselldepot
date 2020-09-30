@@ -23,7 +23,7 @@ class UserCmsApiController extends Controller
     public function index(Request $request)
     {
         $users = User::email($request->email)->userName($request->username)->name($request->name)
-                    ->state($request->state)->with('profileImage')->orderBy('username')
+                    ->state($request->state)->with('profileImage','permissions','roles')->orderBy('username')
                     ->paginate();
 
         return $users;
@@ -61,6 +61,8 @@ class UserCmsApiController extends Controller
             $new_user->created_by = 1;
             $new_user->updated_by = 1;
             $new_user->save();
+            $new_user->syncRoles($request->roles);
+            $new_user->syncPermissions($request->permissions);
 
             DB::commit();
             return response()->json(['msg'=>__('Save successfully'), 'user'=>$new_user->refresh()], 201);
@@ -97,6 +99,7 @@ class UserCmsApiController extends Controller
      */
     public function update(UserStoreUpdateRequest $request, $id)
     {
+        $path = null;
         if(!$user = User::find($id)){
             return response()->json(['msg_error' => __('Not found')], 404);
         }
@@ -133,6 +136,8 @@ class UserCmsApiController extends Controller
             }
             $user->file_id = $file ? $file->id : null;
             $user->save();
+            $user->syncRoles($request->roles);
+            $user->syncPermissions($request->permissions);
 
             DB::commit();
             return response()->json(['msg'=>__('Save successfully'), 'user'=>$user->refresh()], 200);

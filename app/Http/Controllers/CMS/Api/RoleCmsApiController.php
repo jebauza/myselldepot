@@ -19,7 +19,14 @@ class RoleCmsApiController extends Controller
      */
     public function index(Request $request)
     {
-        $roles = Rol::orderBy('id','DESC')->paginate();
+        $roles = Rol::orderBy('name')->paginate();
+
+        return $roles;
+    }
+
+    public function getAllRoles(Request $request)
+    {
+        $roles = Rol::orderBy('name')->get();
 
         return $roles;
     }
