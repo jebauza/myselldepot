@@ -23,7 +23,7 @@ class UserCmsApiController extends Controller
     public function index(Request $request)
     {
         $users = User::email($request->email)->userName($request->username)->name($request->name)
-                    ->state($request->state)->with('profileImage','permissions','roles')->orderBy('username')
+                    ->state($request->state)->with('permissions','roles')->orderBy('username')
                     ->paginate();
 
         return $users;
@@ -83,7 +83,7 @@ class UserCmsApiController extends Controller
      */
     public function show(Request $request, $id)
     {
-        if($user = User::with('profileImage')->find($id)) {
+        if($user = User::find($id)) {
             return $user;
         }
 

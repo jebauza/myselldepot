@@ -2,7 +2,7 @@
 <div>
     <Navbar :basepath="basepath"></Navbar>
 
-    <Sidebar :basepath="basepath"></Sidebar>
+    <Sidebar :basepath="basepath" :auth_user="authUser"></Sidebar>
 
     <Content :basepath="basepath"></Content>
 
@@ -19,6 +19,18 @@ import Footer from './layouts/Footer';
 
 export default {
     components: {Navbar,Sidebar,Content,Footer},
-    props: ['basepath']
+    props: ['basepath', 'auth_user'],
+    data() {
+        return {
+            authUser: this.auth_user
+        }
+    },
+    mounted() {
+        EventBus.$on('verifyAuthenticatedUser', user => {
+            if(user.id === this.authUser.id) {
+                this.authUser = user;
+            }
+        });
+    },
 }
 </script>

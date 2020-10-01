@@ -13,7 +13,7 @@
 
                 <form @submit.prevent="login">
                     <div class="input-group mb-3">
-                        <input type="email" placeholder="Correo"
+                        <input @keyup.enter="login" type="email" placeholder="Correo"
                             v-model="form.email" name="email"
                             :class="['form-control', errors.email ? 'is-invalid' : '']"
                             required autocomplete="email" autofocus>
@@ -27,7 +27,7 @@
                         </span>
                     </div>
                     <div class="input-group mb-3">
-                        <input type="password" placeholder="Contraseña"
+                        <input @keyup.enter="login" type="password" placeholder="Contraseña"
                             v-model="form.password" name="password"
                             :class="['form-control', errors.password ? 'is-invalid' : '']"
                             required autocomplete="current-password">

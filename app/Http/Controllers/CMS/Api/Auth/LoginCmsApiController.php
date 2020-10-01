@@ -11,7 +11,7 @@ class LoginCmsApiController extends Controller
 {
     public function login(LoginRequest $request)
     {
-        if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        if(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'state' => 'A'])) {
             return response()->json([
                 'msg' => __('Successfully authenticated'),
                 'authUser' => Auth::user()
@@ -25,6 +25,11 @@ class LoginCmsApiController extends Controller
     {
         Auth::logout();
         return response()->json([__('Logged out successfully')], 204);
+    }
+
+    public function refreshUserAuth(Request $request)
+    {
+        return Auth::user()->load('profileImage');
     }
 
     /**

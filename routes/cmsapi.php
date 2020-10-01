@@ -7,6 +7,7 @@ Route::middleware('ajax')->name('cmsapi.')->group(function () {
     Route::prefix('auth')->name('auth.')->group(function () {
         Route::post('/login', 'CMS\Api\Auth\LoginCmsApiController@login')->name('login');
         Route::get('/logout', 'CMS\Api\Auth\LoginCmsApiController@logout')->name('logout');
+        Route::get('/get-refresh-auth-user', 'CMS\Api\Auth\LoginCmsApiController@refreshUserAuth')->name('get-refresh-auth-user');
     });
 
     Route::prefix('administration')->group(function () {

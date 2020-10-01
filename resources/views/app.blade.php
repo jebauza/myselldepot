@@ -7,7 +7,7 @@
     <div class="wrapper" id="app">
 
         @if (Auth::check())
-        <App basepath="{{route('web.basepath')}}"></App>
+        <App basepath="{{route('web.basepath')}}" :auth_user="{{ Auth::user() }}"></App>
         @else
         <Auth basepath="{{route('web.basepath')}}"></Auth>
         @endif
