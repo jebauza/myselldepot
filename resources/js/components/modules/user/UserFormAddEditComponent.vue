@@ -273,6 +273,7 @@ export default {
             const url = `/cmsapi/administration/users/${this.form.id}/update`;
             axios.post(url, formData, config)
             .then(res => {
+                EventBus.$emit('verifyAuthenticatedUser', res.data.user);
                 this.fullscreenLoading = false;
                 Swal.fire({
                     title: res.data.msg,

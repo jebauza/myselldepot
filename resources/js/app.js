@@ -24,6 +24,9 @@ Vue.component('pagination', require('laravel-vue-pagination'));
 export const EventBus = new Vue();
 window.EventBus = EventBus;
 
+/*  //Moment date
+window.moment = require('moment'); */
+
 /* Componentes de la app */
 Vue.component('Auth', require('./components/Auth').default);
 Vue.component('App', require('./components/App').default);

@@ -72,25 +72,29 @@
                         </a>
                     </li>
 
-                    <li class="nav-header">ADMINISTRACION</li>
-                    <li class="nav-item">
-                        <router-link :to="{path: '/users'}" :class="['nav-link', isActive('/users') ? 'active' : '']">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Usuarios</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{path: '/roles'}" :class="['nav-link', isActive('/roles') ? 'active' : '']">
-                            <i class="nav-icon fas fa-unlock-alt"></i>
-                            <p>Roles</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-key"></i>
-                            <p>Permisos</p>
-                        </a>
-                    </li>
+                    <!-- ADMINISTRACION -->
+                    <template v-if="userPermissions.includes('users.index', 'roles.index')">
+                        <li class="nav-header">ADMINISTRACION</li>
+                        <li v-if="userPermissions.includes('users.index')" class="nav-item">
+                            <router-link :to="{path: '/users'}" :class="['nav-link', isActive('/users') ? 'active' : '']">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Usuarios</p>
+                            </router-link>
+                        </li>
+                        <li v-if="userPermissions.includes('roles.index')" class="nav-item">
+                            <router-link :to="{path: '/roles'}" :class="['nav-link', isActive('/roles') ? 'active' : '']">
+                                <i class="nav-icon fas fa-unlock-alt"></i>
+                                <p>Roles</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-key"></i>
+                                <p>Permisos</p>
+                            </a>
+                        </li>
+                    </template>
+
 
                     <li class="nav-header">REPORTES</li>
                     <li class="nav-item">
@@ -110,7 +114,7 @@
 
 <script>
 export default {
-    props: ['basepath', 'auth_user'],
+    props: ['basepath', 'auth_user', 'userPermissions'],
     data() {
         return {
             fullscreenLoading: false

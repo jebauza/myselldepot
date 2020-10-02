@@ -15,8 +15,9 @@ Route::middleware('ajax')->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\UserCmsApiController@index')->name('index');
             Route::post('/store', 'CMS\Api\UserCmsApiController@store')->name('store');
             Route::post('/{user_id}/update', 'CMS\Api\UserCmsApiController@update')->name('update');
-            Route::put('/{user_id}/set-state', 'CMS\Api\UserCmsApiController@setState')->name('setState');
+            Route::put('/{user_id}/set-state', 'CMS\Api\UserCmsApiController@setState')->name('set-state');
             Route::get('/{user_id}/show', 'CMS\Api\UserCmsApiController@show')->name('show');
+            Route::get('/{user_id}/get-permissions', 'CMS\Api\UserCmsApiController@getPermissions')->name('get-permissions');
         });
 
         Route::prefix('permissions')->name('permissions.')->group(function () {

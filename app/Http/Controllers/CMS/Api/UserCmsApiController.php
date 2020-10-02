@@ -14,12 +14,6 @@ use App\Http\Requests\UserStoreUpdateRequest;
 
 class UserCmsApiController extends Controller
 {
-    protected $path;
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index(Request $request)
     {
         $users = User::email($request->email)->userName($request->username)->name($request->name)
@@ -29,12 +23,6 @@ class UserCmsApiController extends Controller
         return $users;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(UserStoreUpdateRequest $request)
     {
         $path = null;
@@ -75,12 +63,6 @@ class UserCmsApiController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show(Request $request, $id)
     {
         if($user = User::find($id)) {
@@ -90,13 +72,6 @@ class UserCmsApiController extends Controller
         return response()->json(['msg_error' => __('Not found')], 404);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(UserStoreUpdateRequest $request, $id)
     {
         $path = null;
@@ -163,6 +138,17 @@ class UserCmsApiController extends Controller
                 'msg'=>__('User :state successfully', ['state'=>__($user->state == 'A' ? 'activated' : 'deactivated')]),
                 'user'=>$user
             ], 200);
+        }else {
+            return response()->json(['msg_error' => __('No encontrado')], 404);
+        }
+
+        return response()->json(['msg_error' => __('Internal Server Error')], 500);
+    }
+
+    public function getPermissions(Request $request, $id)
+    {
+        if($user = User::find($id)) {
+            return $user->getAllPermissions();
         }else {
             return response()->json(['msg_error' => __('No encontrado')], 404);
         }

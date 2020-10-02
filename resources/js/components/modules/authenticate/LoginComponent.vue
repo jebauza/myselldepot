@@ -71,15 +71,25 @@ export default {
             const url = '/cmsapi/auth/login';
             axios.post(url,this.form)
             .then(res => {
-                window.location.href = '/home';
+                //window.location.href = '/home';
                 //this.fullscreenLoading = false;
-                /* this.$router.push({name: 'home'});
-                location.reload(); */
+                this.getPermissionsByUser(res.data.authUser.id);
             })
             .catch(err => {
                 this.fullscreenLoading = false;
                 this.errors = err.response.data.errors;
             })
+        },
+        getPermissionsByUser(user_id) {
+            this.fullscreenLoading = true;
+            const url = `/cmsapi/administration/users/${user_id}/get-permissions`;
+            axios.get(url)
+            .then(res => {
+                this.userPermissions = res.data.map(p => p.name);
+                sessionStorage.setItem('listPermissionsByAuthUser', JSON.stringify(this.userPermissions));
+                location.reload();
+                //this.$router.push({name: 'home'});
+            });
         }
     },
 }

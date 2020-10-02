@@ -12,9 +12,6 @@
         <Auth basepath="{{route('web.basepath')}}"></Auth>
         @endif
 
-        {{-- <App basepath="{{route('web.basepath')}}"></App> --}}
-
-        <!-- /.control-sidebar -->
         <div id="sidebar-overlay"></div>
     </div>
     <!-- ./wrapper -->
