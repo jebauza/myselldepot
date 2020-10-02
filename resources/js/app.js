@@ -8,33 +8,28 @@ require('./bootstrap');
 
 window.Vue = require('vue');
 
-/**
- * The following block of code may be used to automatically register your
- * Vue components. It will recursively scan this directory for the Vue
- * components and automatically register them with their "basename".
- *
- * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
- */
-
-// const files = require.context('./', true, /\.vue$/i)
-// files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default))
-
-Vue.component('App', require('./components/App.vue').default);
-
-Vue.component('pagination', require('laravel-vue-pagination'));
-
-/* import VueSweetalert2 from 'vue-sweetalert2';
-Vue.use(VueSweetalert2);
-https://www.digitalocean.com/community/tutorials/vuejs-vue-sweetalert2#installation
-*/
-import Swal from 'sweetalert2';
-window.Swal = Swal;
-
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 Vue.use(ElementUI);
 
-Vue.component('example-component', require('./components/ExampleComponent.vue').default);
+import Swal from 'sweetalert2';
+window.Swal = Swal;
+/* import VueSweetalert2 from 'vue-sweetalert2';
+Vue.use(VueSweetalert2);
+https://www.digitalocean.com/community/tutorials/vuejs-vue-sweetalert2#installation
+*/
+
+Vue.component('pagination', require('laravel-vue-pagination'));
+
+export const EventBus = new Vue();
+window.EventBus = EventBus;
+
+/*  //Moment date
+window.moment = require('moment'); */
+
+/* Componentes de la app */
+Vue.component('Auth', require('./components/Auth').default);
+Vue.component('App', require('./components/App').default);
 
 /**
  * Next, we will create a fresh Vue application instance and attach it to

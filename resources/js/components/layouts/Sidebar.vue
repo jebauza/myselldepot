@@ -1,21 +1,34 @@
 <template>
 <aside class="main-sidebar elevation-4 sidebar-dark-primary">
         <!-- Brand Logo -->
-        <a href="../../index3.html" class="brand-link navbar-danger">
+        <router-link :to="{name:'home'}" class="brand-link navbar-danger">
             <img :src="basepath + '/img/AdminLTELogo.png'" alt="AdminLTE Logo"
                 class="brand-image img-circle elevation-3" style="opacity: .8">
             <span class="brand-text font-weight-light">MySellDepot</span>
-        </a>
+        </router-link>
 
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Sidebar user (optional) -->
             <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
-                    <img :src="basepath + '/img/user2-160x160.jpg'" class="img-circle elevation-2" alt="Administrador">
+                    <router-link :to="{name:'profile', params: {id: auth_user.id}}" class="d-block">
+                        <img v-if="auth_user.profile_image && auth_user.profile_image.url" class="img-circle elevation-2" style="height:34px !important;" :src="auth_user.profile_image.url" :alt="auth_user.username">
+                        <img v-else class="img-circle elevation-2" :src="basepath + '/img/user2-160x160.jpg'" :alt="auth_user.username">
+                    </router-link>
                 </div>
                 <div class="info">
-                    <a href="#" class="d-block">Administrador</a>
+                    <router-link :to="{name:'profile', params: {id: auth_user.id}}" class="d-block">
+                        {{ `${auth_user.firstname} ${auth_user.secondname ? auth_user.secondname : ''}`}}
+                    </router-link>
+                </div>
+            </div>
+
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="info">
+                    <a href="#" class="d-block" @click.prevent="logout" v-loading.fullscreen.lock="fullscreenLoading">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sección
+                    </a>
                 </div>
             </div>
 
@@ -59,25 +72,29 @@
                         </a>
                     </li>
 
-                    <li class="nav-header">ADMINISTRACION</li>
-                    <li class="nav-item">
-                        <router-link :to="{path: '/users'}" :class="['nav-link', isActive('/users') ? 'active' : '']">
-                            <i class="nav-icon fas fa-users"></i>
-                            <p>Usuarios</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{path: '/roles'}" :class="['nav-link', isActive('/roles') ? 'active' : '']">
-                            <i class="nav-icon fas fa-unlock-alt"></i>
-                            <p>Roles</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-key"></i>
-                            <p>Permisos</p>
-                        </a>
-                    </li>
+                    <!-- ADMINISTRACION -->
+                    <template v-if="userPermissions.includes('users.index', 'roles.index')">
+                        <li class="nav-header">ADMINISTRACION</li>
+                        <li v-if="userPermissions.includes('users.index')" class="nav-item">
+                            <router-link :to="{path: '/users'}" :class="['nav-link', isActive('/users') ? 'active' : '']">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>Usuarios</p>
+                            </router-link>
+                        </li>
+                        <li v-if="userPermissions.includes('roles.index')" class="nav-item">
+                            <router-link :to="{path: '/roles'}" :class="['nav-link', isActive('/roles') ? 'active' : '']">
+                                <i class="nav-icon fas fa-unlock-alt"></i>
+                                <p>Roles</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-key"></i>
+                                <p>Permisos</p>
+                            </a>
+                        </li>
+                    </template>
+
 
                     <li class="nav-header">REPORTES</li>
                     <li class="nav-item">
@@ -97,10 +114,26 @@
 
 <script>
 export default {
-    props: ['basepath'],
+    props: ['basepath', 'auth_user', 'userPermissions'],
+    data() {
+        return {
+            fullscreenLoading: false
+        }
+    },
     methods: {
         isActive(path_url) {
             return this.currentPage.indexOf(path_url) === 0;
+        },
+        logout() {
+            this.fullscreenLoading = true;
+            const url = '/cmsapi/auth/logout';
+            axios.get(url)
+            .then(res => {
+                window.location.href = '/login';
+                //this.fullscreenLoading = false;
+                /* this.$router.push({name: 'login'});
+                location.reload(); */
+            });
         }
     },
     computed: {

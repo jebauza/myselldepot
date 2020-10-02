@@ -6,5 +6,7 @@
     "Save successfully": "Guardado con éxito",
     "User :state successfully": "Usuario :state con éxito",
     "deactivated": "desactivado",
-    "activated": "activado"
+    "activated": "activado",
+    "Successfully authenticated": "Successfully authenticated",
+    "Logged out successfully": "Se ha cerrado sesión correctamente"
 }

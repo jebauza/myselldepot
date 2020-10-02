@@ -2,7 +2,7 @@
 <div>
     <Navbar :basepath="basepath"></Navbar>
 
-    <Sidebar :basepath="basepath"></Sidebar>
+    <Sidebar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Sidebar>
 
     <Content :basepath="basepath"></Content>
 
@@ -19,6 +19,38 @@ import Footer from './layouts/Footer';
 
 export default {
     components: {Navbar,Sidebar,Content,Footer},
-    props: ['basepath']
+    props: ['basepath', 'auth_user'],
+    mounted() {
+        sessionStorage.setItem('authUser', JSON.stringify(this.auth_user));
+        this.userPermissions = JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
+
+        EventBus.$on('verifyAuthenticatedUser', user => {
+            const user_id = user ? user.id : this.authUser.id;
+            if(user_id === this.authUser.id) {
+                this.authUser = user ? user : this.authUser;
+                this.refreshUserAuth();
+            }
+        });
+
+        this.refreshUserAuth();
+    },
+    data() {
+        return {
+            authUser: this.auth_user,
+            userPermissions: [],
+        }
+    },
+    methods: {
+        refreshUserAuth() {
+            const url = '/cmsapi/auth/get-refresh-auth-user';
+            axios.get(url)
+            .then(res => {
+                this.authUser = res.data.authUser;
+                this.userPermissions = res.data.userPermissions;
+                sessionStorage.setItem('authUser', JSON.stringify(this.auth_user));
+                sessionStorage.setItem('listPermissionsByAuthUser', JSON.stringify(this.userPermissions));
+            });
+        }
+    },
 }
 </script>

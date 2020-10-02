@@ -233,6 +233,7 @@ export default {
                 name: this.form.name,
                 permissions: checkedIdPermissions
             }).then(res => {
+                EventBus.$emit('verifyAuthenticatedUser', null);
                 this.fullscreenLoading = false;
                 Swal.fire({
                     title: res.data.msg,

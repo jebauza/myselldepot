@@ -40,6 +40,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    protected $with = ['profileImage'];
+
     protected $appends = ['fullName'];
 
     //Attributes
@@ -77,6 +79,7 @@ class User extends Authenticatable
         }
     }
 
+    //Relaciones
     public function profileImage()
     {
         return $this->belongsTo(File::class, 'file_id', 'id');

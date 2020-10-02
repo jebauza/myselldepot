@@ -6,9 +6,12 @@
 <body class="hold-transition sidebar-mini">
     <div class="wrapper" id="app">
 
-        <App basepath="{{route('web.basepath')}}"></App>
+        @if (Auth::check())
+        <App basepath="{{route('web.basepath')}}" :auth_user="{{ Auth::user() }}"></App>
+        @else
+        <Auth basepath="{{route('web.basepath')}}"></Auth>
+        @endif
 
-        <!-- /.control-sidebar -->
         <div id="sidebar-overlay"></div>
     </div>
     <!-- ./wrapper -->

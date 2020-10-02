@@ -208,6 +208,7 @@ export default {
             axios.post(url, formData, config)
             .then(res => {
                 this.user = res.data.user;
+                this.refreshUserAuth();
                 this.form = {
                     firstname: this.user.firstname,
                     secondname: this.user.secondname,
@@ -242,6 +243,14 @@ export default {
                 this.errors = err.response.data.errors;
             });
         },
+        refreshUserAuth() {
+            const url = '/cmsapi/auth/get-refresh-auth-user';
+            axios.get(url)
+            .then(res => {
+                let authUser = res.data.authUser;
+                EventBus.$emit('verifyAuthenticatedUser', authUser);
+            });
+        }
     },
 }
 </script>
