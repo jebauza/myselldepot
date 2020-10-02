@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\CMS\Api\Auth;
 
+use Illuminate\Http\Request;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Request;
+
 
 class LoginCmsApiController extends Controller
 {
@@ -14,7 +15,8 @@ class LoginCmsApiController extends Controller
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password, 'state' => 'A'])) {
             return response()->json([
                 'msg' => __('Successfully authenticated'),
-                'authUser' => Auth::user()
+                'authUser' => Auth::user()->load('permissions'),
+                'userPermissions' => Auth::user()->getAllPermissions()
             ], 200);
         } else{
             return response()->json(['errors' => ['email' => [__('auth.failed')]]], 422);
@@ -29,7 +31,11 @@ class LoginCmsApiController extends Controller
 
     public function refreshUserAuth(Request $request)
     {
-        return Auth::user()->load('profileImage');
+        $auth_user = $request->user();
+        return [
+            'authUser' => $auth_user,
+            'userPermissions' => $auth_user->getAllPermissions()->pluck('name')
+        ];
     }
 
     /**

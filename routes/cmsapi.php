@@ -2,10 +2,10 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('ajax')->name('cmsapi.')->group(function () {
+Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
 
     Route::prefix('auth')->name('auth.')->group(function () {
-        Route::post('/login', 'CMS\Api\Auth\LoginCmsApiController@login')->name('login');
+        Route::post('/login', 'CMS\Api\Auth\LoginCmsApiController@login')->name('login')->withoutMiddleware(['auth']);;
         Route::get('/logout', 'CMS\Api\Auth\LoginCmsApiController@logout')->name('logout');
         Route::get('/get-refresh-auth-user', 'CMS\Api\Auth\LoginCmsApiController@refreshUserAuth')->name('get-refresh-auth-user');
     });
@@ -31,25 +31,7 @@ Route::middleware('ajax')->name('cmsapi.')->group(function () {
             Route::get('/{role_id}/permissions-by-role', 'CMS\Api\RoleCmsApiController@getPermissionsByRole')->name('get-permissions-by-role');
             Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->name('store');
             Route::put('/{role_id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update');
-            /* Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->name('store');
-            Route::put('/{id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update'); */
         });
     });
 });
 
-/* Route::middleware(['auth'])->name('cmsapi.')->group(function () {
-
-    Route::apiResources([
-        'users' => 'UserController',
-        'enterprises' => 'EnterpriseController',
-        'clients' => 'ClientController',
-        'establishment_types' => 'EstablishmentTypeController',
-        'establishments' => 'EstablishmentController',
-        'departments' => 'DepartmentController',
-        'establishment_evaluations' => 'EstablishmentEvaluationController',
-        'department_evaluations' => 'DepartmentEvaluationController',
-        'indicators' => 'IndicatorController',
-        'indicator_groups' => 'IndicatorGroupController',
-        'surveys' => 'SurveyController'
-    ]);
-}); */

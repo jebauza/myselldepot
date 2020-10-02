@@ -24,6 +24,17 @@ export default new Router({
             path: '/users',
             name: 'users',
             component: require('./components/modules/user/UserListComponent').default,
+            beforeEnter: (to, from, next) => {
+                const authUser = JSON.parse(sessionStorage.getItem('authUser'));
+                if(authUser) {
+                    const userPermissions = JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
+                    if(userPermissions.includes('users.index')) {
+                        next();
+                    }else {
+                        next(from.path);
+                    }
+                }
+            },
             meta: {
                 breadcrumb: [
                     { name: 'Home', link: '/home' },
@@ -48,6 +59,18 @@ export default new Router({
             path: '/roles',
             name: 'roles',
             component: require('./components/modules/role/RoleListComponent.vue').default,
+            /* middleware */
+            beforeEnter: (to, from, next) => {
+                const authUser = JSON.parse(sessionStorage.getItem('authUser'));
+                if(authUser) {
+                    const userPermissions = JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
+                    if(userPermissions.includes('roles.index')) {
+                        next();
+                    }else {
+                        next(from.path != '/' ? from.path : '/home');
+                    }
+                }
+            },
             meta: {
                 breadcrumb: [
                     { name: 'Home', link: '/home' },

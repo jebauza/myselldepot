@@ -247,7 +247,7 @@ export default {
             const url = '/cmsapi/auth/get-refresh-auth-user';
             axios.get(url)
             .then(res => {
-                let authUser = res.data;
+                let authUser = res.data.authUser;
                 EventBus.$emit('verifyAuthenticatedUser', authUser);
             });
         }
