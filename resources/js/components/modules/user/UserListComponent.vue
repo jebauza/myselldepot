@@ -4,7 +4,7 @@
         <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
         <div class="card-header">
-            <div class="card-tools">
+            <div v-if="authUserPermissions.includes('users.create')" class="card-tools">
                 <button @click="openModalAddEdit('add')" class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nuevo Usuario</i>
                 </button>
@@ -218,6 +218,12 @@ export default {
                     })
                 }
             });
+        }
+    },
+
+    computed: {
+        authUserPermissions() {
+            return JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
         }
     },
 
