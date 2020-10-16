@@ -33,5 +33,11 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::put('/{role_id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update');
         });
     });
+
+    Route::prefix('categories')->name('categories.')->group(function () {
+        Route::get('/', 'CMS\Api\CategoryCmsApiController@index')->name('index');
+        Route::post('/store', 'CMS\Api\CategoryCmsApiController@store')->name('store');
+        Route::put('/{category_id}/update', 'CMS\Api\CategoryCmsApiController@update')->name('update');
+    });
 });
 

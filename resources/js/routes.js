@@ -85,6 +85,20 @@ export const routes = [
         }
     },
     {
+        path: '/categories',
+        name: 'categories',
+        component: require('./components/modules/category/CategoryListComponent').default,
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/home' },
+                { name: 'Categorias' }
+            ]
+        }
+    },
+
+
+
+    {
         path: '*',
         component: require('./components/layouts/404').default,
         meta: {
