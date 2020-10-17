@@ -4,8 +4,9 @@
         <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
         <div class="card-header">
-            <div v-if="authUserPermissions.includes('users.create')" class="card-tools">
-                <button @click="showForm('add')" class="btn btn-info btn-sm">
+            <div class="card-tools">
+                <button v-if="authUserPermissions.includes('categories.store')" @click="showForm('add')"
+                    class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nueva Categoría</i>
                 </button>
             </div>
@@ -62,7 +63,8 @@
                                         <td v-text="category.name"></td>
                                         <td v-text="category.description"></td>
                                         <td>
-                                            <button @click="showForm('edit', category)" class="btn btn-flat btn-info btn-xs" title="Editar">
+                                            <button v-if="authUserPermissions.includes('categories.update')" @click="showForm('edit', category)"
+                                                class="btn btn-flat btn-info btn-xs" title="Editar">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
                                         </td>
@@ -271,7 +273,6 @@ export default {
             })
         }
     },
-
     computed: {
         authUserPermissions() {
             return JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));

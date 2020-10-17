@@ -5,7 +5,8 @@
 
         <div class="card-header">
             <div class="card-tools">
-                <button @click="openModalAddEdit('add')" class="btn btn-info btn-sm">
+                <button v-if="authUserPermissions.includes('roles.store')" @click="openModalAddEdit('add')"
+                    class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nuevo Rol</i>
                 </button>
             </div>
@@ -60,10 +61,12 @@
                                     <tr v-for="(role, index) in roles.data" :key="role.id">
                                         <td>{{ role.name }}</td>
                                         <td>
-                                            <button @click="openModalAddEdit('show', role)" class="btn btn-flat btn-primary btn-xs" title="Ver">
+                                            <button v-if="authUserPermissions.includes('roles.show')" @click="openModalAddEdit('show', role)"
+                                                class="btn btn-flat btn-primary btn-xs" title="Ver">
                                                 <i class="fas fa-eye"></i>
                                             </button>
-                                            <button @click="openModalAddEdit('edit', role)" class="btn btn-flat btn-info btn-xs" title="Editar">
+                                            <button v-if="authUserPermissions.includes('roles.update')" @click="openModalAddEdit('edit', role)"
+                                                    class="btn btn-flat btn-info btn-xs" title="Editar">
                                                     <i class="fas fa-pencil-alt"></i>
                                             </button>
                                         </td>
@@ -134,6 +137,10 @@ export default {
             this.getRoles(this.roles.current_page ?? 1 );
         },
     },
-
+    computed: {
+        authUserPermissions() {
+            return JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
+        }
+    }
 }
 </script>
