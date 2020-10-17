@@ -88,6 +88,9 @@ export const routes = [
         path: '/categories',
         name: 'categories',
         component: require('./components/modules/category/CategoryListComponent').default,
+        beforeEnter: (to, from, next) => {
+            accessVerification(to, from, next, 'categories.index');
+        },
         meta: {
             breadcrumb: [
                 { name: 'Home', link: '/home' },

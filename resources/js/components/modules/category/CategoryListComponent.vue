@@ -162,7 +162,7 @@ export default {
     methods: {
         getCategories(page = 1) {
             this.loaded = false;
-            const url = `/cmsapi/categories?page=${page}`;
+            const url = `/cmsapi/configuration/categories?page=${page}`;
             axios.get(url, {
                 params: this.searches
             }).then(res => {
@@ -208,7 +208,7 @@ export default {
         },
         storeCategory() {
             this.fullscreenLoading = true;
-            const url = '/cmsapi/categories/store';
+            const url = '/cmsapi/configuration/categories/store';
 
             axios.post(url, this.form)
             .then(res => {
@@ -240,7 +240,7 @@ export default {
         },
         updateCategory() {
             this.fullscreenLoading = true;
-            const url = `/cmsapi/categories/${this.form.id}/update`;
+            const url = `/cmsapi/configuration/categories/${this.form.id}/update`;
 
             axios.put(url, this.form)
             .then(res => {

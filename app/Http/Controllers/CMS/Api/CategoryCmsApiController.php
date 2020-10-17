@@ -19,11 +19,6 @@ class CategoryCmsApiController extends Controller
 
     public function store(CategoryStoreUpdateRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string'
-        ]);
-
         $new_category = new Category($request->all());
         $new_category->created_by = $request->user()->id;
         $new_category->updated_by = $request->user()->id;
