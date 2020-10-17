@@ -60,10 +60,11 @@
 
                     <li class="nav-header">CONFIGURACION</li>
                     <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-sitemap"></i>
-                            <p>Categorias</p>
-                        </a>
+                        <router-link v-if="userPermissions.includes('categories.index')" :to="{path: '/categories'}"
+                            :class="['nav-link', isActive('/categories') ? 'active' : '']">
+                                <i class="nav-icon fas fa-sitemap"></i>
+                                <p>Categorias</p>
+                        </router-link>
                     </li>
                     <li class="nav-item">
                         <a href="#" class="nav-link">

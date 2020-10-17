@@ -4,7 +4,7 @@
         <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
         <div class="card-header">
-            <div class="card-tools">
+            <div v-if="authUserPermissions.includes('users.store')" class="card-tools">
                 <button @click="openModalAddEdit('add')" class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nuevo Usuario</i>
                 </button>
@@ -90,7 +90,8 @@
                                                 <i class="fas fa-eye"></i>
                                             </router-link>
                                             <template v-if="user.state == 'A'">
-                                                <button @click="openModalAddEdit('edit', user)" class="btn btn-flat btn-info btn-xs" title="Editar">
+                                                <button v-if="authUserPermissions.includes('users.update')" @click="openModalAddEdit('edit', user)"
+                                                    class="btn btn-flat btn-info btn-xs" title="Editar">
                                                     <i class="fas fa-pencil-alt"></i>
                                                 </button>
                                                 <button class="btn btn-flat btn-success btn-xs" title="Permiso">
@@ -218,6 +219,12 @@ export default {
                     })
                 }
             });
+        }
+    },
+
+    computed: {
+        authUserPermissions() {
+            return JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
         }
     },
 

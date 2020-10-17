@@ -14,7 +14,7 @@ class RoleStoreUpdateRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;//auth()->check();
+        return auth()->check();
     }
 
     /**

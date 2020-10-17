@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands\Deploy;
 
+use App\Models\Rol;
+use App\User;
 use Illuminate\Console\Command;
 use Spatie\Permission\Models\Permission;
 
@@ -46,12 +48,21 @@ class DeployCommand extends Command
     private function createUpdatePermissions() {
 
         $permissions = config('myselldepot.permissions');
+        $array_permissions = [];
 
         foreach ($permissions as $p) {
             $p = Permission::updateOrCreate(
                 ['name' => $p['name']],
                 ['display_name' => $p['display_name']]
             );
+            $array_permissions[] = $p['name'];
+        }
+
+        $role = Rol::updateOrCreate(['name' => 'Super Admin']);
+        $role->syncPermissions($array_permissions);
+
+        if($user_admin = User::where('username','jebauza')->first()) {
+            $user_admin->assignRole($role->name);
         }
     }
 }

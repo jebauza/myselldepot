@@ -28,6 +28,7 @@ class UserCmsApiController extends Controller
         $path = null;
         try {
             DB::beginTransaction();
+            $authUser = $request->user();
 
             $file = null;
             if($request->file('image')) {
@@ -37,8 +38,8 @@ class UserCmsApiController extends Controller
                 $file = File::create([
                     'path' => $path,
                     'filename' => $image_name,
-                    'created_by' => 1,
-                    'updated_by' => 1,
+                    'created_by' => $authUser->id,
+                    'updated_by' => $authUser->id,
                 ]);
             }
 
@@ -46,8 +47,8 @@ class UserCmsApiController extends Controller
             $new_user->secondname = $request->secondname ?? null;
             $new_user->password = Hash::make($request->password);
             $new_user->file_id = $file ? $file->id : null;
-            $new_user->created_by = 1;
-            $new_user->updated_by = 1;
+            $new_user->created_by = $authUser->id;
+            $new_user->updated_by = $authUser->id;
             $new_user->save();
             $new_user->syncRoles($request->roles);
             $new_user->syncPermissions($request->permissions);
@@ -81,6 +82,7 @@ class UserCmsApiController extends Controller
 
         try {
             DB::beginTransaction();
+            $authUser = $request->user();
 
             $file = $user->profileImage;
             if($request->file('image')) {
@@ -91,13 +93,13 @@ class UserCmsApiController extends Controller
                     if(Storage::exists($file->path)) {
                         Storage::delete($file->path);
                     }
-                    $file->fill(['path' => $path])->save();
+                    $file->fill(['path' => $path, 'updated_by' => $authUser->id])->save();
                 }else {
                     $file = File::create([
                         'path' => $path,
                         'filename' => $image_name,
-                        'created_by' => 1,
-                        'updated_by' => 1,
+                        'created_by' => $authUser->id,
+                        'updated_by' => $authUser->id,
                     ]);
                 }
             }
@@ -110,6 +112,7 @@ class UserCmsApiController extends Controller
                 $user->password = Hash::make($request->password);
             }
             $user->file_id = $file ? $file->id : null;
+            $user->updated_by = $authUser->id;
             $user->save();
             $user->syncRoles($request->roles);
             $user->syncPermissions($request->permissions);
@@ -133,6 +136,7 @@ class UserCmsApiController extends Controller
 
         if($user = User::find($id)) {
             $user->state = $request->state;
+            $user->updated_by = $request->user()->id;
             $user->save();
             return response()->json([
                 'msg'=>__('User :state successfully', ['state'=>__($user->state == 'A' ? 'activated' : 'deactivated')]),
