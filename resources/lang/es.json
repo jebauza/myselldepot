@@ -8,5 +8,6 @@
     "deactivated": "desactivado",
     "activated": "activado",
     "Successfully authenticated": "Successfully authenticated",
-    "Logged out successfully": "Se ha cerrado sesión correctamente"
+    "Logged out successfully": "Se ha cerrado sesión correctamente",
+    "Forbidden access": "Acceso Prohibido"
 }

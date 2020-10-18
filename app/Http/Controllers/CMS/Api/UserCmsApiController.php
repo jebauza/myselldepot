@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\UserStoreUpdateRequest;
@@ -133,6 +134,11 @@ class UserCmsApiController extends Controller
         $request->validate([
             'state' => 'required|in:A,I'
         ]);
+
+        if (($request->state == 'A' && !Gate::allows('users.set-state', 'users.activate'))
+        || ($request->state == 'I' && !Gate::allows('users.set-state', 'users.deactivate'))) {
+            return response()->json(['msg_error' => __('Forbidden access')], 403);
+        }
 
         if($user = User::find($id)) {
             $user->state = $request->state;

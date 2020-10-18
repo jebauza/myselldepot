@@ -240,11 +240,11 @@ export default {
             })
             .catch(err => {
                 this.fullscreenLoading = false;
-                if(err.response.data.msg_error)
+                if(err.response.data.msg_error || err.response.data.message)
                 {
                     Swal.fire({
                         title: 'Error!',
-                        text: err.response.data.msg_error,
+                        text: err.response.data.msg_error ? err.response.data.msg_error : err.response.data.message,
                         icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',
@@ -287,11 +287,11 @@ export default {
             })
             .catch(err => {
                 this.fullscreenLoading = false;
-                if(err.response.data.msg_error)
+                if(err.response.data.msg_error || err.response.data.message)
                 {
                     Swal.fire({
                         title: 'Error!',
-                        text: err.response.data.msg_error,
+                        text: err.response.data.msg_error ? err.response.data.msg_error : err.response.data.message,
                         icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',

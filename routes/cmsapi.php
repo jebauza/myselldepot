@@ -6,7 +6,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
 
     /* AUTH */
     Route::prefix('auth')->name('auth.')->group(function () {
-        Route::post('/login', 'CMS\Api\Auth\LoginCmsApiController@login')->name('login')->withoutMiddleware(['auth']);;
+        Route::post('/login', 'CMS\Api\Auth\LoginCmsApiController@login')->name('login')->withoutMiddleware(['auth']);
         Route::get('/logout', 'CMS\Api\Auth\LoginCmsApiController@logout')->name('logout');
         Route::get('/get-refresh-auth-user', 'CMS\Api\Auth\LoginCmsApiController@refreshUserAuth')->name('get-refresh-auth-user');
     });
@@ -19,7 +19,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\UserCmsApiController@index')->middleware('permission:users.index')->name('index');
             Route::post('/store', 'CMS\Api\UserCmsApiController@store')->middleware('permission:users.store')->name('store');
             Route::post('/{user_id}/update', 'CMS\Api\UserCmsApiController@update')->middleware('permission:users.update')->name('update');
-            Route::put('/{user_id}/set-state', 'CMS\Api\UserCmsApiController@setState')->name('set-state');
+            Route::put('/{user_id}/set-state', 'CMS\Api\UserCmsApiController@setState')->middleware('permission:users.activate|users.deactivate')->name('set-state');
             Route::get('/{user_id}/show', 'CMS\Api\UserCmsApiController@show')->name('show');
             Route::get('/{user_id}/get-permissions', 'CMS\Api\UserCmsApiController@getPermissions')->name('get-permissions');
         });

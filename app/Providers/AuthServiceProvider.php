@@ -25,6 +25,11 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        /* GATES */
+
+        /* Users */
+        Gate::define('users.set-state', function ($user, $permission) {
+            return $user->can($permission);
+        });
     }
 }
