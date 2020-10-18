@@ -49,6 +49,12 @@ class CategoryCmsApiController extends Controller
         return response()->json(['msg_error' => __('Internal Server Error')], 500);
     }
 
+    public function getAllCategories()
+    {
+        $categories = Category::orderBy('name')->get();
+        return $categories;
+    }
+
     /**
      * Remove the specified resource from storage.
      *

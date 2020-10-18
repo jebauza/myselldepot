@@ -22,5 +22,11 @@ return [
         ['name' => 'categories.store', 'display_name' => 'Crear Categoría'],
         ['name' => 'categories.show', 'display_name' => 'Ver Categoría'],
         ['name' => 'categories.update', 'display_name' => 'Modificar Categoría'],
+
+        /* Products */
+        ['name' => 'products.index', 'display_name' => 'Navegar Productos'],
+        ['name' => 'products.store', 'display_name' => 'Crear Producto'],
+        ['name' => 'products.show', 'display_name' => 'Ver Producto'],
+        ['name' => 'products.update', 'display_name' => 'Modificar Producto'],
     ]
 ];

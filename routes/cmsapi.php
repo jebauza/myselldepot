@@ -32,11 +32,11 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
 
         /* ROLES */
         Route::prefix('roles')->name('roles.')->group(function () {
-            Route::get('/', 'CMS\Api\RoleCmsApiController@index')->name('index');
+            Route::get('/', 'CMS\Api\RoleCmsApiController@index')->middleware('permission:roles.index')->name('index');
             Route::get('/get-all-roles', 'CMS\Api\RoleCmsApiController@getAllRoles')->name('get-all-roles');
             Route::get('/{role_id}/permissions-by-role', 'CMS\Api\RoleCmsApiController@getPermissionsByRole')->name('get-permissions-by-role');
-            Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->name('store');
-            Route::put('/{role_id}/update', 'CMS\Api\RoleCmsApiController@update')->name('update');
+            Route::post('/store', 'CMS\Api\RoleCmsApiController@store')->middleware('permission:roles.store')->name('store');
+            Route::put('/{role_id}/update', 'CMS\Api\RoleCmsApiController@update')->middleware('permission:roles.update')->name('update');
         });
     });
 
@@ -48,6 +48,14 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\CategoryCmsApiController@index')->middleware('permission:categories.index')->name('index');
             Route::post('/store', 'CMS\Api\CategoryCmsApiController@store')->middleware('permission:categories.store')->name('store');
             Route::put('/{category_id}/update', 'CMS\Api\CategoryCmsApiController@update')->middleware('permission:categories.update')->name('update');
+            Route::get('/get-all-categories', 'CMS\Api\CategoryCmsApiController@getAllCategories')->name('get-categories');
+        });
+
+        /* PRODUCT */
+        Route::prefix('products')->name('products.')->group(function () {
+            Route::get('/', 'CMS\Api\ProductCmsApiController@index')->middleware('permission:products.index')->name('index');
+            Route::post('/store', 'CMS\Api\ProductCmsApiController@store')->middleware('permission:products.store')->name('store');
+            Route::put('/{product_id}/update', 'CMS\Api\ProductCmsApiController@update')->middleware('permission:products.update')->name('update');
         });
 
 

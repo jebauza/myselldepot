@@ -58,20 +58,24 @@
                         </router-link>
                     </li>
 
-                    <li class="nav-header">CONFIGURACION</li>
-                    <li class="nav-item">
-                        <router-link v-if="userPermissions.includes('categories.index')" :to="{path: '/categories'}"
-                            :class="['nav-link', isActive('/categories') ? 'active' : '']">
-                                <i class="nav-icon fas fa-sitemap"></i>
-                                <p>Categorias</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-apple-alt"></i>
-                            <p>Productos</p>
-                        </a>
-                    </li>
+                    <!-- CONFIGURACION -->
+                    <template v-if="userPermissions.includes('categories.index', 'products.index')">
+                        <li class="nav-header">CONFIGURACION</li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('categories.index')" :to="{path: '/categories'}"
+                                :class="['nav-link', isActive('/categories') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-sitemap"></i>
+                                    <p>Categorias</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('products.index')" :to="{path: '/products'}"
+                                :class="['nav-link', isActive('/products') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-apple-alt"></i>
+                                    <p>Productos</p>
+                            </router-link>
+                        </li>
+                    </template>
 
                     <!-- ADMINISTRACION -->
                     <template v-if="userPermissions.includes('users.index', 'roles.index')">
