@@ -10,7 +10,7 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Sidebar user (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="user-panel mt-3 pb-3 mb-1 d-flex">
                 <div class="image">
                     <router-link :to="{name:'profile', params: {id: auth_user.id}}" class="d-block">
                         <img v-if="auth_user.profile_image && auth_user.profile_image.url" class="img-circle elevation-2" style="height:34px !important;" :src="auth_user.profile_image.url" :alt="auth_user.username">
@@ -24,13 +24,16 @@
                 </div>
             </div>
 
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="info">
-                    <a href="#" class="d-block" @click.prevent="logout" v-loading.fullscreen.lock="fullscreenLoading">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sección
+            <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact user-panel mb-3"
+                data-widget="treeview" role="menu" data-accordion="false">
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link" @click.prevent="logout" v-loading.fullscreen.lock="fullscreenLoading">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <p> Cerrar Sección</p>
                     </a>
-                </div>
-            </div>
+                </li>
+            </ul>
 
             <!-- Sidebar Menu -->
             <nav class="mt-2">

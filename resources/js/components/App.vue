@@ -1,6 +1,6 @@
 <template>
 <div>
-    <Navbar :basepath="basepath"></Navbar>
+    <Navbar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Navbar>
 
     <Sidebar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Sidebar>
 
