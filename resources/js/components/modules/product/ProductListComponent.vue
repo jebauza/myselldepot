@@ -4,10 +4,11 @@
         <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
         <div class="card-header">
-            <div v-if="authUserPermissions.includes('products.store')" class="card-tools">
-                <!-- <button @click="openModalAddEdit('add')" class="btn btn-info btn-sm">
+            <div class="card-tools">
+                <button v-if="authUserPermissions.includes('products.store')" @click="openModalAddEdit('add')"
+                    class="btn btn-info btn-sm">
                     <i class="fas fa-plus-square"> Nuevo Producto</i>
-                </button> -->
+                </button>
             </div>
         </div>
 
@@ -80,10 +81,10 @@
                                         <td v-text="product.description"></td>
                                         <td v-text="product.stock"></td>
                                         <td v-text="product.price"></td>
-                                        <td v-text="'product.category'"></td>
+                                        <td>{{ product.category ? product.category.name : '' }}</td>
 
                                         <td>
-                                            <button v-if="authUserPermissions.includes('products.update')"
+                                            <button v-if="authUserPermissions.includes('products.update')" @click="openModalAddEdit('edit', product)"
                                                 class="btn btn-flat btn-info btn-xs" title="Editar">
                                                 <i class="fas fa-pencil-alt"></i>
                                             </button>
@@ -99,7 +100,7 @@
                     </div>
                 </div>
 
-                <!-- <user-form-add-edit ref="userFormAddEdit" @updateUserList="updateUserList"></user-form-add-edit> -->
+                <product-form-add-edit ref="productFormAddEdit" @updateProductList="updateProductList"></product-form-add-edit>
 
             </div>
 
@@ -110,10 +111,10 @@
 
 <script>
 import Multiselect from 'vue-multiselect';
-//import UserFormAddEdit from './UserFormAddEditComponent';
+import ProductFormAddEdit from './ProductFormAddEditComponent';
 
 export default {
-    components: {Multiselect},
+    components: {Multiselect,ProductFormAddEdit},
     created() {
         this.getProducts();
     },
@@ -175,57 +176,13 @@ export default {
                 categories: []
             };
         },
-
-
-
-        /* openModalAddEdit(action, user = null) {
-            this.$refs.userFormAddEdit.showForm(action, user);
+        openModalAddEdit(action, product = null) {
+            this.$refs.productFormAddEdit.showForm(action, product);
         },
-        updateUserList(action = null) {
-            this.getUsers(this.users.current_page ?? 1 );
+        updateProductList(action = null) {
+            this.getProducts(this.products.current_page ?? 1 );
         },
-        setUserState(newState, user) {
-            Swal.fire({
-                title: 'Estas seguro de ' + (newState == 'I' ? 'desactivar' : 'activar') + ' el usuario',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: (newState == 'I' ? 'Si, desactivar' : 'Si, activar')
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    this.fullscreenLoading = true;
-                    const url = `/cmsapi/administration/users/${user.id}/set-state`;
-                    axios.put(url,{
-                        state: newState
-                    })
-                    .then(res => {
-                        this.fullscreenLoading = false;
-                        Swal.fire({
-                            title: res.data.msg,
-                            icon: "success",
-                            timer: 1500,
-                            showConfirmButton: false
-                        });
-                        this.updateUserList();
-                    })
-                    .catch(err => {
-                        this.fullscreenLoading = false;
-                        if(err.response.data.msg_error || err.response.data.message)
-                        {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: err.response.data.msg_error ? err.response.data.msg_error : err.response.data.message,
-                                icon: "error",
-                                showCloseButton: true,
-                                closeButtonColor: 'red',
-                            });
-                        }
-                        console.log(err.response.data);
-                    })
-                }
-            });
-        } */
+
     },
 
     computed: {

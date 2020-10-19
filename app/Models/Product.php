@@ -29,7 +29,7 @@ class Product extends Model
     public function scopeCategoryIds($query, $category_ids)
     {
         if(is_array($category_ids) && !empty($category_ids)){
-            return $query->whereIn('category_id', $category_ids);
+            return $query->whereIn('categorie_id', $category_ids);
         }
     }
 
