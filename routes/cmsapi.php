@@ -28,6 +28,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
         Route::prefix('permissions')->name('permissions.')->group(function () {
             Route::get('/', 'CMS\Api\PermissionCmsApiController@index')->name('index');
             Route::get('/get-all-permissions', 'CMS\Api\PermissionCmsApiController@getAllPermissions')->name('get-all-permissions');
+            Route::get('/auth-user/get-all-permissions', 'CMS\Api\PermissionCmsApiController@authUserAllPermissions')->name('auth-user.get-all-permissions');
         });
 
         /* ROLES */

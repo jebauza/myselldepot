@@ -19,7 +19,7 @@
             <div class="input-group input-group-sm">
                 <el-autocomplete
                     class="inline-input"
-                    v-model="state2"
+                    v-model="search"
                     :fetch-suggestions="querySearch"
                     placeholder="Buscar..."
                     :trigger-on-focus="false"
@@ -136,51 +136,44 @@
 
 <script>
 export default {
-    props: ['basepath', 'auth_user', 'userPermissions'],
+    props: ['basepath', 'auth_user'],
     mounted() {
-      this.getListPermissionsByAuthUser();
-    },
-    watch: {
-        userPermissions: function (newValue, oldValue) {
+        EventBus.$on('verifyAuthenticatedUser', user => {
             this.getListPermissionsByAuthUser();
-        }
+        });
+        this.getListPermissionsByAuthUser();
     },
     data() {
         return {
-            state2: '',
-            links: [],
-            permissionsByAuthUser: []
+            search: '',
+            links: []
         }
     },
     methods: {
         querySearch(queryString, cb) {
-            var links = this.links;
-            var results = queryString ? links.filter(this.createFilter(queryString)) : links;
+            let links = this.links;
+            let results = links;
+            if(queryString) {
+                results = links.filter((link) => {
+                    return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
+                });
+            }
+
             // call callback function to return suggestions
             cb(results);
         },
-        createFilter(queryString) {
-            return (link) => {
-            return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
-            };
-        },
-        loadAll() {
-            return [
-            { "value": "vue", "link": "https://github.com/vuejs/vue" },
-            { "value": "element", "link": "https://github.com/ElemeFE/element" },
-            { "value": "cooking", "link": "https://github.com/ElemeFE/cooking" },
-            { "value": "mint-ui", "link": "https://github.com/ElemeFE/mint-ui" },
-            { "value": "vuex", "link": "https://github.com/vuejs/vuex" },
-            { "value": "vue-router", "link": "https://github.com/vuejs/vue-router" },
-            { "value": "babel", "link": "https://github.com/babel/babel" }
-            ];
-        },
         handleSelect(item) {
             console.log(item);
+            if(this.$route.name != item.link) {
+                this.$router.push({name: item.link});
+                this.search = '';
+            }else {
+                this.search = '';
+            }
         },
         getListPermissionsByAuthUser() {
             this.links = [];
-            const url = '/cmsapi/administration/permissions/get-all-permissions';
+            const url = '/cmsapi/administration/permissions/auth-user/get-all-permissions';
 
             axios.get(url)
             .then(res => {
@@ -188,12 +181,12 @@ export default {
                     if(permission.name.includes('index')) {
                         this.links.push({
                             value: permission.display_name,
-                            link: "https://github.com/vuejs/vue"
+                            link: permission.name.split('.')[0]
                         });
                     }
                 });
 
-            })
+            });
         }
     }
 }
