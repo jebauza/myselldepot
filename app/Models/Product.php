@@ -33,7 +33,7 @@ class Product extends Model
         }
     }
 
-    //Relaciones
+    //Relations
     public function category()
     {
         return $this->belongsTo(Category::class, 'categorie_id', 'id');

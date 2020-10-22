@@ -58,8 +58,18 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::post('/store', 'CMS\Api\ProductCmsApiController@store')->middleware('permission:products.store')->name('store');
             Route::put('/{product_id}/update', 'CMS\Api\ProductCmsApiController@update')->middleware('permission:products.update')->name('update');
         });
+    });
 
+    /* OPERATION */
+    Route::prefix('operation')->group(function () {
 
+        /* ORDERS */
+        Route::prefix('orders')->name('orders.')->group(function () {
+            Route::get('/', 'CMS\Api\CategoryCmsApiController@index')->middleware('permission:categories.index')->name('index');
+            Route::post('/store', 'CMS\Api\CategoryCmsApiController@store')->middleware('permission:categories.store')->name('store');
+            Route::put('/{category_id}/update', 'CMS\Api\CategoryCmsApiController@update')->middleware('permission:categories.update')->name('update');
+            Route::get('/get-all-categories', 'CMS\Api\CategoryCmsApiController@getAllCategories')->name('get-categories');
+        });
     });
 
 

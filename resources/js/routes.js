@@ -120,6 +120,20 @@ export const routes = [
             ]
         }
     },
+    {
+        path: '/orders',
+        name: 'orders',
+        component: require('./components/modules/order/OrderListComponent').default,
+        beforeEnter: (to, from, next) => {
+            accessVerification(to, from, next, 'orders.index');
+        },
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/home' },
+                { name: 'Pedidos' }
+            ]
+        }
+    },
 
 
 

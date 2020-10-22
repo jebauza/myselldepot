@@ -47,19 +47,24 @@
                         </router-link>
                     </li>
 
-                    <li class="nav-header">OPERACIONES</li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cash-register"></i>
-                            <p>Pedidos</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{path: '/clients'}" :class="['nav-link', isActive('/clients') ? 'active' : '']">
-                            <i class="nav-icon fas fa-user-friends"></i>
-                            <p>Clientes</p>
-                        </router-link>
-                    </li>
+                    <!-- OPERACIONES -->
+                    <template v-if="userPermissions.includes('orders.index', 'clients.index')">
+                        <li class="nav-header">OPERACIONES</li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('orders.index')" :to="{path: '/orders'}"
+                                :class="['nav-link', isActive('/orders') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-cash-register"></i>
+                                    <p>Pedidos</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('clients.index')" :to="{path: '/clients'}"
+                                :class="['nav-link', isActive('/clients') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-user-friends"></i>
+                                    <p>Clientes</p>
+                            </router-link>
+                        </li>
+                    </template>
 
                     <!-- CONFIGURACION -->
                     <template v-if="userPermissions.includes('categories.index', 'products.index')">

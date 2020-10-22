@@ -9,8 +9,8 @@
             <li class="nav-item d-none d-sm-inline-block">
                 <router-link :to="{name: 'home'}" class="nav-link">Home</router-link>
             </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <router-link :to="{path: 'home'}" class="nav-link">Pedidos</router-link>
+            <li v-if="userPermissions.includes('orders.index')" class="nav-item d-none d-sm-inline-block">
+                <router-link :to="{path: 'orders'}" class="nav-link">Pedidos</router-link>
             </li>
         </ul>
 
@@ -136,7 +136,7 @@
 
 <script>
 export default {
-    props: ['basepath', 'auth_user'],
+    props: ['basepath', 'auth_user', 'userPermissions'],
     mounted() {
         EventBus.$on('verifyAuthenticatedUser', user => {
             this.getListPermissionsByAuthUser();
