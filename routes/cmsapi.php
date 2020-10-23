@@ -65,10 +65,9 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
 
         /* ORDERS */
         Route::prefix('orders')->name('orders.')->group(function () {
-            Route::get('/', 'CMS\Api\CategoryCmsApiController@index')->middleware('permission:categories.index')->name('index');
-            Route::post('/store', 'CMS\Api\CategoryCmsApiController@store')->middleware('permission:categories.store')->name('store');
-            Route::put('/{category_id}/update', 'CMS\Api\CategoryCmsApiController@update')->middleware('permission:categories.update')->name('update');
-            Route::get('/get-all-categories', 'CMS\Api\CategoryCmsApiController@getAllCategories')->name('get-categories');
+            Route::get('/', 'CMS\Api\OrderCmsApiController@index')->middleware('permission:orders.index')->name('index');
+            Route::post('/store', 'CMS\Api\OrderCmsApiController@store')->middleware('permission:orders.store')->name('store');
+            Route::put('/{category_id}/update', 'CMS\Api\OrderCmsApiController@update')->middleware('permission:orders.update')->name('update');
         });
     });
 

@@ -84,4 +84,9 @@ class User extends Authenticatable
     {
         return $this->belongsTo(File::class, 'file_id', 'id');
     }
+
+    public function orders_sold()
+    {
+        return $this->hasMany(Order::class, 'user_id', 'id');
+    }
 }

@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers\CMS\Api;
 
-use App\Http\Controllers\Controller;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class OrderCmsApiController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::orderBy('id')->paginate();
+        $orders = Order::customerName($request->name)->customerDocument($request->document)->orderNumber($request->order)
+                        ->state($request->state)->orderBy('order_number', 'DESC')->paginate();
 
         return $orders;
     }

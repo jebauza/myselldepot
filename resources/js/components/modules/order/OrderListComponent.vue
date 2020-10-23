@@ -5,10 +5,10 @@
 
         <div class="card-header">
             <div class="card-tools">
-                <!-- <button v-if="authUserPermissions.includes('products.store')" @click="openModalAddEdit('add')"
+                <button v-if="authUserPermissions.includes('products.store')" @click="openModalAddEdit('add')"
                     class="btn btn-info btn-sm">
-                    <i class="fas fa-plus-square"> Nuevo Producto</i>
-                </button> -->
+                    <i class="fas fa-plus-square"> Nuevo Pedido</i>
+                </button>
             </div>
         </div>
 
@@ -33,9 +33,9 @@
                             <div class="form-group col-sm-3 col-md-2 col-lg-2">
                                 <label class="control-label">Estado</label>
                                 <select v-model="searches.state" class="form-control" >
-                                    <option></option>
-                                    <option>1</option>
-                                    <option>2</option>
+                                    <option value=""></option>
+                                    <option value="A">Activo</option>
+                                    <option value="I">Inactivo</option>
                                 </select>
                             </div>
                             <div class="form-group col-9 col-sm-7 col-md-11 col-lg-3">
@@ -122,17 +122,20 @@ export default {
     created() {
         this.getOrders();
     },
-    /* watch: {
+    watch: {
         'searches.name': function (newValue, oldValue) {
-            this.getProducts();
+            this.getOrders();
         },
-        'searches.description': function (newValue, oldValue) {
-            this.getProducts();
+        'searches.document': function (newValue, oldValue) {
+            this.getOrders();
         },
-        'searches.categories': function (newValue, oldValue) {
-            this.getProducts();
+        'searches.order': function (newValue, oldValue) {
+            this.getOrders();
+        },
+        'searches.state': function (newValue, oldValue) {
+            this.getOrders();
         }
-    }, */
+    },
     data() {
         return {
             orders: {data:[]},
@@ -157,7 +160,7 @@ export default {
             axios.get(url, {
                 params: this.searches
             }).then(res => {
-                this.products = res.data;
+                this.orders = res.data;
                 this.loaded = true;
             })
         },
