@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Model;
 
 class Category extends Model
@@ -23,5 +24,11 @@ class Category extends Model
         if($description){
             return $query->where('description', 'like', "%$description%");
         }
+    }
+
+    //Relaciones
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'categorie_id', 'id');
     }
 }

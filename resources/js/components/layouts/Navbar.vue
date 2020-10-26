@@ -7,23 +7,29 @@
                 <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
             </li>
             <li class="nav-item d-none d-sm-inline-block">
-                <a href="../../index3.html" class="nav-link">Home</a>
+                <router-link :to="{name: 'home'}" class="nav-link">Home</router-link>
             </li>
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="#" class="nav-link">Contact</a>
+            <li v-if="userPermissions.includes('orders.index')" class="nav-item d-none d-sm-inline-block">
+                <router-link :to="{path: 'orders'}" class="nav-link">Pedidos</router-link>
             </li>
         </ul>
 
         <!-- SEARCH FORM -->
         <form class="form-inline ml-3">
             <div class="input-group input-group-sm">
-                <input class="form-control form-control-navbar" type="search" placeholder="Search"
-                    aria-label="Search">
-                <div class="input-group-append">
-                    <button class="btn btn-navbar" type="submit">
-                        <i class="fas fa-search"></i>
-                    </button>
-                </div>
+                <el-autocomplete
+                    class="inline-input"
+                    v-model="search"
+                    :fetch-suggestions="querySearch"
+                    placeholder="Buscar..."
+                    :trigger-on-focus="false"
+                    size="small"
+                    @select="handleSelect">
+                    <i
+                        class="el-icon-search el-input__icon"
+                        slot="suffix">
+                    </i>
+                </el-autocomplete>
             </div>
         </form>
 
@@ -130,7 +136,59 @@
 
 <script>
 export default {
-    props: ['basepath']
+    props: ['basepath', 'auth_user', 'userPermissions'],
+    mounted() {
+        EventBus.$on('verifyAuthenticatedUser', user => {
+            this.getListPermissionsByAuthUser();
+        });
+        this.getListPermissionsByAuthUser();
+    },
+    data() {
+        return {
+            search: '',
+            links: []
+        }
+    },
+    methods: {
+        querySearch(queryString, cb) {
+            let links = this.links;
+            let results = links;
+            if(queryString) {
+                results = links.filter((link) => {
+                    return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
+                });
+            }
+
+            // call callback function to return suggestions
+            cb(results);
+        },
+        handleSelect(item) {
+            console.log(item);
+            if(this.$route.name != item.link) {
+                this.$router.push({name: item.link});
+                this.search = '';
+            }else {
+                this.search = '';
+            }
+        },
+        getListPermissionsByAuthUser() {
+            this.links = [];
+            const url = '/cmsapi/administration/permissions/auth-user/get-all-permissions';
+
+            axios.get(url)
+            .then(res => {
+                res.data.map(permission => {
+                    if(permission.name.includes('index')) {
+                        this.links.push({
+                            value: permission.display_name,
+                            link: permission.name.split('.')[0]
+                        });
+                    }
+                });
+
+            });
+        }
+    }
 }
 </script>
 

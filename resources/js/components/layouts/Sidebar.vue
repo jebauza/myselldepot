@@ -10,7 +10,7 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <!-- Sidebar user (optional) -->
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <div class="user-panel mt-3 pb-3 mb-1 d-flex">
                 <div class="image">
                     <router-link :to="{name:'profile', params: {id: auth_user.id}}" class="d-block">
                         <img v-if="auth_user.profile_image && auth_user.profile_image.url" class="img-circle elevation-2" style="height:34px !important;" :src="auth_user.profile_image.url" :alt="auth_user.username">
@@ -24,13 +24,16 @@
                 </div>
             </div>
 
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
-                <div class="info">
-                    <a href="#" class="d-block" @click.prevent="logout" v-loading.fullscreen.lock="fullscreenLoading">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sección
+            <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent nav-compact user-panel mb-3"
+                data-widget="treeview" role="menu" data-accordion="false">
+
+                <li class="nav-item">
+                    <a href="#" class="nav-link" @click.prevent="logout" v-loading.fullscreen.lock="fullscreenLoading">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <p> Cerrar Sección</p>
                     </a>
-                </div>
-            </div>
+                </li>
+            </ul>
 
             <!-- Sidebar Menu -->
             <nav class="mt-2">
@@ -44,34 +47,43 @@
                         </router-link>
                     </li>
 
-                    <li class="nav-header">OPERACIONES</li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-cash-register"></i>
-                            <p>Pedidos</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <router-link :to="{path: '/clients'}" :class="['nav-link', isActive('/clients') ? 'active' : '']">
-                            <i class="nav-icon fas fa-user-friends"></i>
-                            <p>Clientes</p>
-                        </router-link>
-                    </li>
+                    <!-- OPERACIONES -->
+                    <template v-if="userPermissions.includes('orders.index', 'customers.index')">
+                        <li class="nav-header">OPERACIONES</li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('orders.index')" :to="{path: '/orders'}"
+                                :class="['nav-link', isActive('/orders') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-cash-register"></i>
+                                    <p>Pedidos</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('customers.index')" :to="{path: '/customers'}"
+                                :class="['nav-link', isActive('/customers') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-user-friends"></i>
+                                    <p>Clientes</p>
+                            </router-link>
+                        </li>
+                    </template>
 
-                    <li class="nav-header">CONFIGURACION</li>
-                    <li class="nav-item">
-                        <router-link v-if="userPermissions.includes('categories.index')" :to="{path: '/categories'}"
-                            :class="['nav-link', isActive('/categories') ? 'active' : '']">
-                                <i class="nav-icon fas fa-sitemap"></i>
-                                <p>Categorias</p>
-                        </router-link>
-                    </li>
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-apple-alt"></i>
-                            <p>Productos</p>
-                        </a>
-                    </li>
+                    <!-- CONFIGURACION -->
+                    <template v-if="userPermissions.includes('categories.index', 'products.index')">
+                        <li class="nav-header">CONFIGURACION</li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('categories.index')" :to="{path: '/categories'}"
+                                :class="['nav-link', isActive('/categories') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-sitemap"></i>
+                                    <p>Categorias</p>
+                            </router-link>
+                        </li>
+                        <li class="nav-item">
+                            <router-link v-if="userPermissions.includes('products.index')" :to="{path: '/products'}"
+                                :class="['nav-link', isActive('/products') ? 'active' : '']">
+                                    <i class="nav-icon fas fa-apple-alt"></i>
+                                    <p>Productos</p>
+                            </router-link>
+                        </li>
+                    </template>
 
                     <!-- ADMINISTRACION -->
                     <template v-if="userPermissions.includes('users.index', 'roles.index')">

@@ -203,26 +203,25 @@ export default {
             })
             .catch(err => {
                 this.fullscreenLoading = false;
-                if(err.response.data.msg_error)
-                {
+                if(err.response && err.response.status == 422) {
+                    this.errors = err.response.data.errors;
+                    //Buscar los errores de los elementos del array permissions
+                    if(!this.errors.permissions && Object.keys(this.errors).length !== 0){
+                        for (let i = 0; i < this.permissions.length; i++) {
+                            if(this.errors.hasOwnProperty(`permissions.${i}`)){
+                                this.errors.permissions = this.errors[`permissions.${i}`];
+                                break;
+                            }
+                        }
+                    }
+                }else if(err.response.data.msg_error || err.response.data.message) {
                     Swal.fire({
                         title: 'Error!',
-                        text: err.response.data.msg_error,
+                        text: err.response.data.msg_error ?? err.response.data.message,
                         icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',
                     });
-                }
-                this.errors = err.response.data.errors;
-
-                //Buscar los errores de los elementos del array permissions
-                if(!this.errors.permissions && Object.keys(this.errors).length !== 0){
-                    for (let i = 0; i < this.permissions.length; i++) {
-                        if(this.errors.hasOwnProperty(`permissions.${i}`)){
-                            this.errors.permissions = this.errors[`permissions.${i}`];
-                            break;
-                        }
-                    }
                 }
             });
         },
@@ -247,26 +246,25 @@ export default {
             })
             .catch(err => {
                 this.fullscreenLoading = false;
-                if(err.response.data.msg_error)
-                {
+                if(err.response && err.response.status == 422) {
+                    this.errors = err.response.data.errors;
+                    //Buscar los errores de los elementos del array permissions
+                    if(!this.errors.permissions && Object.keys(this.errors).length !== 0){
+                        for (let i = 0; i < this.permissions.length; i++) {
+                            if(this.errors.hasOwnProperty(`permissions.${i}`)){
+                                this.errors.permissions = this.errors[`permissions.${i}`];
+                                break;
+                            }
+                        }
+                    }
+                }else if(err.response.data.msg_error || err.response.data.message) {
                     Swal.fire({
                         title: 'Error!',
-                        text: err.response.data.msg_error,
+                        text: err.response.data.msg_error ?? err.response.data.message,
                         icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',
                     });
-                }
-                this.errors = err.response.data.errors;
-
-                //Buscar los errores de los elementos del array permissions
-                if(!this.errors.permissions && Object.keys(this.errors).length !== 0){
-                    for (let i = 0; i < this.permissions.length; i++) {
-                        if(this.errors.hasOwnProperty(`permissions.${i}`)){
-                            this.errors.permissions = this.errors[`permissions.${i}`];
-                            break;
-                        }
-                    }
                 }
             });
         },

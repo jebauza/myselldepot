@@ -230,17 +230,17 @@ export default {
             })
             .catch(err => {
                 this.fullscreenLoading = false;
-                if(err.response.data.msg_error)
-                {
+                if(err.response && err.response.status == 422) {
+                    this.errors = err.response.data.errors;
+                }else if(err.response.data.msg_error || err.response.data.message) {
                     Swal.fire({
                         title: 'Error!',
-                        text: err.response.data.msg_error,
+                        text: err.response.data.msg_error ?? err.response.data.message,
                         icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',
                     });
                 }
-                this.errors = err.response.data.errors;
             });
         },
         refreshUserAuth() {

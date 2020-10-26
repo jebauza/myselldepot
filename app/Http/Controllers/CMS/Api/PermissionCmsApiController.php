@@ -25,5 +25,10 @@ class PermissionCmsApiController extends Controller
         return $permissions;
     }
 
+    public function authUserAllPermissions(Request $request)
+    {
+        return $request->user()->getAllPermissions();
+    }
+
 
 }

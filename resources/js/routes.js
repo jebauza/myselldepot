@@ -19,7 +19,15 @@ export const routes = [
     {
         path: '/login',
         name: 'login',
-        component: require('./components/modules/authenticate/LoginComponent').default
+        component: require('./components/modules/authenticate/LoginComponent').default,
+        /* beforeEnter: (to, from, next) => {
+            let authUser = JSON.parse(sessionStorage.getItem('authUser'));
+            if(authUser) {
+                next({name: 'home'});
+            }else {
+                next();
+            }
+        } */
     },
     {
         path: '/home',
@@ -74,9 +82,9 @@ export const routes = [
         }
     },
     {
-        path: '/clients',
-        name: 'clients',
-        component: require('./components/modules/client/ClientListComponent').default,
+        path: '/customers',
+        name: 'customers',
+        component: require('./components/modules/customer/CustomerListComponent').default,
         meta: {
             breadcrumb: [
                 { name: 'Home', link: '/home' },
@@ -95,6 +103,34 @@ export const routes = [
             breadcrumb: [
                 { name: 'Home', link: '/home' },
                 { name: 'Categorias' }
+            ]
+        }
+    },
+    {
+        path: '/products',
+        name: 'products',
+        component: require('./components/modules/product/ProductListComponent').default,
+        beforeEnter: (to, from, next) => {
+            accessVerification(to, from, next, 'products.index');
+        },
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/home' },
+                { name: 'Productos' }
+            ]
+        }
+    },
+    {
+        path: '/orders',
+        name: 'orders',
+        component: require('./components/modules/order/OrderListComponent').default,
+        beforeEnter: (to, from, next) => {
+            accessVerification(to, from, next, 'orders.index');
+        },
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/home' },
+                { name: 'Pedidos' }
             ]
         }
     },

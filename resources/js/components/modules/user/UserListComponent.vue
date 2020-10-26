@@ -97,12 +97,14 @@
                                                 <button class="btn btn-flat btn-success btn-xs" title="Permiso">
                                                     <i class="fas fa-key"></i>
                                                 </button>
-                                                <button @click="setUserState('I', user)" class="btn btn-flat btn-danger btn-xs" title="Desactivar">
+                                                <button v-if="authUserPermissions.includes('users.deactivate')" @click="setUserState('I', user)"
+                                                    class="btn btn-flat btn-danger btn-xs" title="Desactivar">
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </template>
                                             <template v-else>
-                                                <button @click="setUserState('A', user)" class="btn btn-flat btn-success btn-xs" title="Activar">
+                                                <button v-if="authUserPermissions.includes('users.activate')" @click="setUserState('A', user)"
+                                                    class="btn btn-flat btn-success btn-xs" title="Activar">
                                                     <i class="fas fa-check"></i>
                                                 </button>
                                             </template>
@@ -215,6 +217,16 @@ export default {
                     })
                     .catch(err => {
                         this.fullscreenLoading = false;
+                        if(err.response.data.msg_error || err.response.data.message)
+                        {
+                            Swal.fire({
+                                title: 'Error!',
+                                text: err.response.data.msg_error ? err.response.data.msg_error : err.response.data.message,
+                                icon: "error",
+                                showCloseButton: true,
+                                closeButtonColor: 'red',
+                            });
+                        }
                         console.log(err.response.data);
                     })
                 }
