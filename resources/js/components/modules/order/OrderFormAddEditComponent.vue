@@ -15,108 +15,148 @@
                         <div class="container-fluid">
                             <div class="row">
                                 <div class="col-md-4">
-                                <form class="needs-validation" v-on:submit.prevent="storeCustomer">
-                                    <div :class="['card', switch_newcustomer ? 'card-primary' : 'card-success']">
-                                        <div class="card-header">
-                                            <h3 class="card-title">{{ switch_newcustomer ? 'Nuevo' : 'Buscar' }} Cliente</h3>
-                                        </div>
-
-                                        <div class="card-body">
-                                            <div class="form-row">
-
-                                                <div class="col-sm-4 col-md-12 col-lg-9 col-xl-6 mb-3">
-                                                    <vs-switch v-model="switch_newcustomer" @change="clearFormCustomer">
-                                                        <template #off>
-                                                            <i class="fas fa-plus-square"> Nuevo</i>
-                                                        </template>
-                                                        <template #on>
-                                                            <i class="fas fa-plus-square"> Nuevo</i>
-                                                        </template>
-                                                    </vs-switch>
-                                                </div>
-
-                                                <div class="form-group col-12">
-                                                    <el-autocomplete v-if="!switch_newcustomer"
-                                                        class="inline-input"
-                                                        v-model="form.customer.document"
-                                                        :fetch-suggestions="querySearch"
-                                                        placeholder="Buscar..."
-                                                        :trigger-on-focus="false"
-                                                        size="mediun"
-                                                        @select="handleSelect">
-                                                        <i
-                                                            class="el-icon-search el-input__icon"
-                                                            slot="suffix">
-                                                        </i>
-                                                    </el-autocomplete>
-                                                    <input v-else v-model="form.customer.document" type="text" :class="['form-control', errors.document ? 'is-invalid' : '']" name="document" placeholder="Documento" required>
-                                                    <small v-if="errors.document" class="form-control-feedback text-danger">
-                                                        {{ errors.document[0] }}
-                                                    </small>
-                                                </div>
-                                                <template v-if="switch_newcustomer || form.customer.name">
-                                                    <div class="form-group col-12">
-                                                        <input v-model="form.customer.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="name" placeholder="Nombre" required>
-                                                        <small v-if="errors.name" class="form-control-feedback text-danger">
-                                                            {{ errors.name[0] }}
-                                                        </small>
-                                                    </div>
-                                                    <div class="form-group col-12">
-                                                        <input v-model="form.customer.lastname" type="text" :class="['form-control', errors.lastname ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="lastname" placeholder="Apellidos" required>
-                                                        <small v-if="errors.lastname" class="form-control-feedback text-danger">
-                                                            {{ errors.lastname[0] }}
-                                                        </small>
-                                                    </div>
-                                                    <div class="form-group col-12">
-                                                        <input v-model="form.customer.email" type="email" :class="['form-control', errors.email ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="email" placeholder="Email">
-                                                        <small v-if="errors.email" class="form-control-feedback text-danger">
-                                                            {{ errors.email[0] }}
-                                                        </small>
-                                                    </div>
-                                                    <div class="form-group col-12">
-                                                        <input v-model="form.customer.phone" type="text" :class="['form-control', errors.phone ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="phone" placeholder="Teléfono">
-                                                        <small v-if="errors.phone" class="form-control-feedback text-danger">
-                                                            {{ errors.phone[0] }}
-                                                        </small>
-                                                    </div>
-
-                                                    <div v-if="switch_newcustomer" class="form-group col-12">
-                                                        <button type="submit" class="btn btn-primary btn-sm btn-block">Registrar</button>
-                                                    </div>
-                                                </template>
-
+                                    <form class="needs-validation" v-on:submit.prevent="storeCustomer">
+                                        <div :class="['card', switch_newcustomer ? 'card-primary' : 'card-success']">
+                                            <div class="card-header">
+                                                <h3 class="card-title">{{ switch_newcustomer ? 'Nuevo' : 'Buscar' }} Cliente</h3>
                                             </div>
-                                        </div>
 
-                                    </div>
-                                </form>
+                                            <div class="card-body">
+                                                <div class="form-row">
+
+                                                    <div class="col-sm-4 col-md-12 col-lg-9 col-xl-6 mb-3">
+                                                        <vs-switch v-model="switch_newcustomer" @change="clearFormCustomer">
+                                                            <template #off>
+                                                                <i class="fas fa-plus-square"> Nuevo</i>
+                                                            </template>
+                                                            <template #on>
+                                                                <i class="fas fa-plus-square"> Nuevo</i>
+                                                            </template>
+                                                        </vs-switch>
+                                                    </div>
+
+                                                    <div class="form-group col-12">
+                                                        <el-autocomplete v-if="!switch_newcustomer"
+                                                            class="inline-input"
+                                                            v-model="form.customer.document"
+                                                            :fetch-suggestions="querySearch"
+                                                            placeholder="Buscar..."
+                                                            :trigger-on-focus="false"
+                                                            size="mediun"
+                                                            @select="handleSelect">
+                                                            <i
+                                                                class="el-icon-search el-input__icon"
+                                                                slot="suffix">
+                                                            </i>
+                                                        </el-autocomplete>
+                                                        <input v-else v-model="form.customer.document" type="text" :class="['form-control', errors.document ? 'is-invalid' : '']" name="document" placeholder="Documento" required>
+                                                        <small v-if="errors.document" class="form-control-feedback text-danger">
+                                                            {{ errors.document[0] }}
+                                                        </small>
+                                                    </div>
+                                                    <template v-if="switch_newcustomer || form.customer.name">
+                                                        <div class="form-group col-12">
+                                                            <input v-model="form.customer.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="name" placeholder="Nombre" required>
+                                                            <small v-if="errors.name" class="form-control-feedback text-danger">
+                                                                {{ errors.name[0] }}
+                                                            </small>
+                                                        </div>
+                                                        <div class="form-group col-12">
+                                                            <input v-model="form.customer.lastname" type="text" :class="['form-control', errors.lastname ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="lastname" placeholder="Apellidos" required>
+                                                            <small v-if="errors.lastname" class="form-control-feedback text-danger">
+                                                                {{ errors.lastname[0] }}
+                                                            </small>
+                                                        </div>
+                                                        <div class="form-group col-12">
+                                                            <input v-model="form.customer.email" type="email" :class="['form-control', errors.email ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="email" placeholder="Email">
+                                                            <small v-if="errors.email" class="form-control-feedback text-danger">
+                                                                {{ errors.email[0] }}
+                                                            </small>
+                                                        </div>
+                                                        <div class="form-group col-12">
+                                                            <input v-model="form.customer.phone" type="text" :class="['form-control', errors.phone ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="phone" placeholder="Teléfono">
+                                                            <small v-if="errors.phone" class="form-control-feedback text-danger">
+                                                                {{ errors.phone[0] }}
+                                                            </small>
+                                                        </div>
+
+                                                        <div v-if="switch_newcustomer" class="form-group col-12">
+                                                            <button type="submit" class="btn btn-primary btn-sm btn-block">Registrar</button>
+                                                        </div>
+                                                    </template>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </form>
                                 </div>
 
                                 <div class="col-md-8">
-                                    <!-- <div class="card card-info">
+                                    <div class="card card-info">
                                         <div class="card-header">
-                                            <h3 class="card-title">Lista de premisos</h3>
+                                            <h3 class="card-title">Productos
+                                                <span v-if="listCheckProducts.length" v-text="listCheckProducts.length" class="right badge badge-dark"></span>
+                                            </h3>
                                         </div>
 
-                                        <div v-if="permissions.length" class="card-body row">
-                                            <div v-if="errors.permissions" class="col-12 alert alert-danger alert-dismissible">
-                                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
-                                                <h6><i class="icon fas fa-ban"></i> {{ errors.permissions[0] }}</h6>
-                                            </div>
-                                            <div v-for="(p, index) in filterPermissions" :key="p.id" class="col-12 col-lg-6 col-xl-4">
-                                                <div class="form-group">
-                                                    <div class="custom-control custom-checkbox">
-                                                        <input class="custom-control-input" type="checkbox" :id="'checkboxPermission-'+(index)" v-model="p.checked" :disabled="modalType=='show'">
-                                                        <label :for="'checkboxPermission-'+(index)" class="custom-control-label" style="cursor: pointer">{{ p.display_name }}</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div v-else class="alert alert-warning mx-2 text-center" style="margin-top: 18px;">
-                                            No hay ningún elemento para mostrar
+                                        <div class="card-body table-responsive">
+
+                                            <vs-tooltip not-arrow right>
+                                                <vs-button border @click.prevent="addProduct()"
+                                                    square
+                                                    icon
+                                                    color="rgb(59,222,200)"
+                                                    gradient>
+                                                    <i class="fas fa-plus-square"></i>
+                                                </vs-button>
+                                                <template #tooltip>
+                                                    Agregar Producto
+                                                </template>
+                                            </vs-tooltip>
+
+                                            <table class="table table-sm">
+                                                <thead>
+                                                    <tr class="bg-dark">
+                                                        <th>#</th>
+                                                        <th>Artículo</th>
+                                                        <th>Stock</th>
+                                                        <th>Precio</th>
+                                                        <th>SubTotal</th>
+                                                        <th>Acción</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr v-for="(p, index) in listCheckProducts" :key="index+1">
+                                                        <th>{{ index+1 }}</th>
+                                                        <td>
+                                                            <el-select v-model="p.id" filterable placeholder="Select" size="small">
+                                                                <el-option v-for="product in filterProducts"
+                                                                    :key="product.id"
+                                                                    :label="product.name"
+                                                                    :value="product.id">
+                                                                </el-option>
+                                                            </el-select>
+                                                        </td>
+                                                        <td>
+                                                            <el-input-number v-model="p.stock" size="small"
+                                                                controls-position="right"
+                                                                :min="1">
+                                                            </el-input-number>
+                                                        </td>
+                                                        <td v-text="p.price"></td>
+                                                        <td v-text="p.subTotal"></td>
+                                                        <td>
+                                                            <button @click="removeProduct(index)" class="btn btn-flat btn-danger btn-xs">
+                                                                    <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                         </div>
 
-                                    </div> -->
+                                    </div>
                                 </div>
 
                             </div>
@@ -140,6 +180,7 @@
 export default {
     mounted() {
         this.getAllCustomers();
+        this.getAllProducts();
     },
     data() {
         return {
@@ -159,6 +200,9 @@ export default {
             },
             errors: {},
 
+            all_products: [],
+            listCheckProducts: [],
+
             fullscreenLoading: false
         }
     },
@@ -169,6 +213,14 @@ export default {
             axios.get(url)
             .then(res => {
                 this.all_customers = res.data;
+            });
+        },
+        getAllProducts() {
+            const url = '/cmsapi/configuration/products/get-all-products';
+
+            axios.get(url)
+            .then(res => {
+                this.all_products = res.data;
             });
         },
         querySearch(queryString, cb) {
@@ -228,6 +280,7 @@ export default {
                 .then(res => {
                     this.switch_newcustomer = false;
                     this.getAllCustomers();
+                    this.getAllProducts();
                     this.fullscreenLoading = false;
                     Swal.fire({
                         title: res.data.msg,
@@ -262,7 +315,19 @@ export default {
             }
 
         },
-
+        addProduct() {
+            if(this.listCheckProducts.length < this.all_products.length) {
+                this.listCheckProducts.push({
+                    id: '',
+                    stock: 1,
+                    price: '',
+                    subTotal: ''
+                });
+            }
+        },
+        removeProduct(index) {
+            this.$delete(this.listCheckProducts, index)
+        },
         actionStoreUpdate() {
             //this.fullscreenLoading = true;
             if(this.modalType == 'add') {
@@ -354,7 +419,15 @@ export default {
 
             return isReady
         }
-    }
+    },
+    computed: {
+        filterProducts() {
+            return this.all_products.filter(p => {
+                let isCheck = this.listCheckProducts.find(element => element.id == p.id);
+                return isCheck ? false : true;
+            })
+        }
+    },
 }
 </script>
 
@@ -362,6 +435,10 @@ export default {
 
 .el-autocomplete {
     width: 100% !important;
+}
+
+.vs-tooltip-content {
+    width: min-content !important;
 }
 
 </style>

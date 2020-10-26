@@ -57,6 +57,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\ProductCmsApiController@index')->middleware('permission:products.index')->name('index');
             Route::post('/store', 'CMS\Api\ProductCmsApiController@store')->middleware('permission:products.store')->name('store');
             Route::put('/{product_id}/update', 'CMS\Api\ProductCmsApiController@update')->middleware('permission:products.update')->name('update');
+            Route::get('/get-all-products', 'CMS\Api\ProductCmsApiController@getAllProducts')->name('get-products');
         });
     });
 

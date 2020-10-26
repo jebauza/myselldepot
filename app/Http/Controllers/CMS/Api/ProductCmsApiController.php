@@ -17,6 +17,11 @@ class ProductCmsApiController extends Controller
         return $products;
     }
 
+    public function getAllProducts(Request $request)
+    {
+        return Product::orderBy('name')->get();
+    }
+
     public function store(ProductStoreUpdateRequest $request)
     {
         $new_product = new Product($request->all());
