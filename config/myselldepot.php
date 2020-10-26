@@ -36,10 +36,11 @@ return [
         ['name' => 'orders.update', 'display_name' => 'Modificar Pedido'],
         ['name' => 'orders.reject', 'display_name' => 'Rechazar Pedido'],
 
-        /* Clients */
-        ['name' => 'clients.index', 'display_name' => 'Navegar Clientes'],
-        ['name' => 'clients.store', 'display_name' => 'Crear Cliente'],
-        ['name' => 'clients.show', 'display_name' => 'Ver Cliente'],
-        ['name' => 'clients.update', 'display_name' => 'Modificar Cliente'],
+        /* Customers */
+        ['name' => 'customers.index', 'display_name' => 'Navegar Clientes'],
+        ['name' => 'customers.store', 'display_name' => 'Crear Cliente'],
+        ['name' => 'customers.show', 'display_name' => 'Ver Cliente'],
+        ['name' => 'customers.update', 'display_name' => 'Modificar Cliente'],
+
     ]
 ];

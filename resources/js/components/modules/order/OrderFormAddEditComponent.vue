@@ -1,0 +1,369 @@
+<template>
+    <div class="modal fade" id="modalOrderFormAddEdit" tabindex="-1" role="dialog" aria-hidden="true" >
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 v-if="modalType=='add'" class="modal-title">Nuevo Pedido</h4>
+                    <h4 v-else class="modal-title">Editar Pedido</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+
+                    <div class="modal-body">
+
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-md-4">
+                                <form class="needs-validation" v-on:submit.prevent="storeCustomer">
+                                    <div :class="['card', switch_newcustomer ? 'card-primary' : 'card-success']">
+                                        <div class="card-header">
+                                            <h3 class="card-title">{{ switch_newcustomer ? 'Nuevo' : 'Buscar' }} Cliente</h3>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <div class="form-row">
+
+                                                <div class="col-sm-4 col-md-12 col-lg-9 col-xl-6 mb-3">
+                                                    <vs-switch v-model="switch_newcustomer" @change="clearFormCustomer">
+                                                        <template #off>
+                                                            <i class="fas fa-plus-square"> Nuevo</i>
+                                                        </template>
+                                                        <template #on>
+                                                            <i class="fas fa-plus-square"> Nuevo</i>
+                                                        </template>
+                                                    </vs-switch>
+                                                </div>
+
+                                                <div class="form-group col-12">
+                                                    <el-autocomplete v-if="!switch_newcustomer"
+                                                        class="inline-input"
+                                                        v-model="form.customer.document"
+                                                        :fetch-suggestions="querySearch"
+                                                        placeholder="Buscar..."
+                                                        :trigger-on-focus="false"
+                                                        size="mediun"
+                                                        @select="handleSelect">
+                                                        <i
+                                                            class="el-icon-search el-input__icon"
+                                                            slot="suffix">
+                                                        </i>
+                                                    </el-autocomplete>
+                                                    <input v-else v-model="form.customer.document" type="text" :class="['form-control', errors.document ? 'is-invalid' : '']" name="document" placeholder="Documento" required>
+                                                    <small v-if="errors.document" class="form-control-feedback text-danger">
+                                                        {{ errors.document[0] }}
+                                                    </small>
+                                                </div>
+                                                <template v-if="switch_newcustomer || form.customer.name">
+                                                    <div class="form-group col-12">
+                                                        <input v-model="form.customer.name" type="text" :class="['form-control', errors.name ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="name" placeholder="Nombre" required>
+                                                        <small v-if="errors.name" class="form-control-feedback text-danger">
+                                                            {{ errors.name[0] }}
+                                                        </small>
+                                                    </div>
+                                                    <div class="form-group col-12">
+                                                        <input v-model="form.customer.lastname" type="text" :class="['form-control', errors.lastname ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="lastname" placeholder="Apellidos" required>
+                                                        <small v-if="errors.lastname" class="form-control-feedback text-danger">
+                                                            {{ errors.lastname[0] }}
+                                                        </small>
+                                                    </div>
+                                                    <div class="form-group col-12">
+                                                        <input v-model="form.customer.email" type="email" :class="['form-control', errors.email ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="email" placeholder="Email">
+                                                        <small v-if="errors.email" class="form-control-feedback text-danger">
+                                                            {{ errors.email[0] }}
+                                                        </small>
+                                                    </div>
+                                                    <div class="form-group col-12">
+                                                        <input v-model="form.customer.phone" type="text" :class="['form-control', errors.phone ? 'is-invalid' : '']" :disabled="!switch_newcustomer" name="phone" placeholder="Teléfono">
+                                                        <small v-if="errors.phone" class="form-control-feedback text-danger">
+                                                            {{ errors.phone[0] }}
+                                                        </small>
+                                                    </div>
+
+                                                    <div v-if="switch_newcustomer" class="form-group col-12">
+                                                        <button type="submit" class="btn btn-primary btn-sm btn-block">Registrar</button>
+                                                    </div>
+                                                </template>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </form>
+                                </div>
+
+                                <div class="col-md-8">
+                                    <!-- <div class="card card-info">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Lista de premisos</h3>
+                                        </div>
+
+                                        <div v-if="permissions.length" class="card-body row">
+                                            <div v-if="errors.permissions" class="col-12 alert alert-danger alert-dismissible">
+                                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                                                <h6><i class="icon fas fa-ban"></i> {{ errors.permissions[0] }}</h6>
+                                            </div>
+                                            <div v-for="(p, index) in filterPermissions" :key="p.id" class="col-12 col-lg-6 col-xl-4">
+                                                <div class="form-group">
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input" type="checkbox" :id="'checkboxPermission-'+(index)" v-model="p.checked" :disabled="modalType=='show'">
+                                                        <label :for="'checkboxPermission-'+(index)" class="custom-control-label" style="cursor: pointer">{{ p.display_name }}</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div v-else class="alert alert-warning mx-2 text-center" style="margin-top: 18px;">
+                                            No hay ningún elemento para mostrar
+                                        </div>
+
+                                    </div> -->
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                        <button type="submit" class="btn btn-primary" v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
+                    </div>
+
+            </div>
+            <!-- /.modal-content -->
+        </div>
+        <!-- /.modal-dialog -->
+    </div>
+</template>
+
+<script>
+
+export default {
+    mounted() {
+        this.getAllCustomers();
+    },
+    data() {
+        return {
+            modalType: 'add', //add, edit
+
+            switch_newcustomer: false,
+            all_customers: [],
+            form: {
+                customer: {
+                    document: '',
+                    name: '',
+                    lastname: '',
+                    email: '',
+                    phone: '',
+                    id: ''
+                }
+            },
+            errors: {},
+
+            fullscreenLoading: false
+        }
+    },
+    methods: {
+        getAllCustomers() {
+            const url = '/cmsapi/operation/customers/get-all-customers';
+
+            axios.get(url)
+            .then(res => {
+                this.all_customers = res.data;
+            });
+        },
+        querySearch(queryString, cb) {
+            let links = []
+            this.all_customers.map(customer => {
+                    links.push({
+                        value: customer.document,
+                        link: customer.id
+                    });
+                });
+
+            let results = links;
+            if(queryString) {
+                results = links.filter((link) => {
+                    return (link.value.toLowerCase().indexOf(queryString.toLowerCase()) !== -1);
+                });
+            }
+
+            // call callback function to return suggestions
+            cb(results);
+        },
+        handleSelect(item) {
+            let customer = this.all_customers.find(c => c.id == item.link);
+            if(customer) {
+                this.form.customer = {
+                    document: customer.document,
+                    name: customer.name,
+                    lastname: customer.lastname,
+                    email: customer.email,
+                    phone: customer.phone,
+                    id: customer.id
+                };
+            }
+        },
+        showForm(action, order = null) {
+            if(this.modalType != action) {
+                this.clearFormCustomer();
+            }
+            this.modalType = action;
+            if(this.modalType === 'edit' && order) {
+                /* this.form = {
+                    name: product.name,
+                    category: product.categorie_id,
+                    stock:  product.stock,
+                    price: product.price,
+                    description: product.description,
+                    id: product.id
+                }; */
+            }
+            this.erros = {};
+            $('#modalOrderFormAddEdit').modal('show');
+        },
+        storeCustomer() {
+            const url = '/cmsapi/operation/customers/store';
+            if(this.validator()) {
+                axios.post(url, this.form.customer)
+                .then(res => {
+                    this.switch_newcustomer = false;
+                    this.getAllCustomers();
+                    this.fullscreenLoading = false;
+                    Swal.fire({
+                        title: res.data.msg,
+                        icon: "success",
+                        timer: 1500,
+                        showConfirmButton: false
+                    });
+                    this.errors = {};
+                    let customer = res.data.customer;
+                    this.form.customer = {
+                        document: customer.document,
+                        name: customer.name,
+                        lastname: customer.lastname,
+                        email: customer.email,
+                        phone: customer.phone,
+                        id: customer.id
+                    };
+                }).catch(err => {
+                    this.fullscreenLoading = false;
+                    if(err.response && err.response.status == 422) {
+                        this.errors = err.response.data.errors;
+                    }else if(err.response.data.msg_error || err.response.data.message) {
+                        Swal.fire({
+                            title: 'Error!',
+                            text: err.response.data.msg_error ?? err.response.data.message,
+                            icon: "error",
+                            showCloseButton: true,
+                            closeButtonColor: 'red',
+                        });
+                    }
+                });
+            }
+
+        },
+
+        actionStoreUpdate() {
+            //this.fullscreenLoading = true;
+            if(this.modalType == 'add') {
+                //this.storeProduct();
+            }else if(this.modalType == 'edit') {
+                //this.updateProduct();
+            }
+        },
+        /* storeProduct() {
+            const url = '/cmsapi/configuration/products/store';
+
+            axios.post(url, this.form)
+            .then(res => {
+                this.fullscreenLoading = false;
+                Swal.fire({
+                    title: res.data.msg,
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                this.$emit('updateProductList', 'add');
+                $('#modalOrderFormAddEdit').modal('hide');
+                this.clearForm();
+            }).catch(err => {
+                this.fullscreenLoading = false;
+                if(err.response && err.response.status == 422) {
+                    this.errors = err.response.data.errors;
+                }else if(err.response.data.msg_error || err.response.data.message) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: err.response.data.msg_error ?? err.response.data.message,
+                        icon: "error",
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
+                    });
+                }
+            });
+        },
+        updateProduct() {
+            const url = `/cmsapi/configuration/products/${this.form.id}/update`;
+
+            axios.put(url, this.form)
+            .then(res => {
+                this.fullscreenLoading = false;
+                Swal.fire({
+                    title: res.data.msg,
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                this.$emit('updateProductList', 'edit');
+                $('#modalOrderFormAddEdit').modal('hide');
+                this.clearForm();
+            }).catch(err => {
+                this.fullscreenLoading = false;
+                if(err.response && err.response.status == 422) {
+                    this.errors = err.response.data.errors;
+                }else if(err.response.data.msg_error || err.response.data.message) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: err.response.data.msg_error ?? err.response.data.message,
+                        icon: "error",
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
+                    });
+                }
+            });
+        }, */
+        clearFormCustomer() {
+            this.form.customer = {
+                document: '',
+                name: '',
+                lastname: '',
+                email: '',
+                phone: '',
+                id: ''
+            };
+            this.errors = {};
+        },
+        validator() {
+
+            let isReady = true;
+            if(this.switch_newcustomer) {
+                if(!this.form.customer.email || !(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.form.customer.email))) {
+                    this.errors.email = ['Email es invalido'];
+                    isReady = false;
+                }
+            }
+
+            return isReady
+        }
+    }
+}
+</script>
+
+<style scoped>
+
+.el-autocomplete {
+    width: 100% !important;
+}
+
+</style>
+
+

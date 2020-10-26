@@ -30,7 +30,7 @@ class ProductStoreUpdateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('roles', 'name')->ignore($product_id)
+                Rule::unique('products', 'name')->ignore($product_id)
             ],
             'description' => 'string',
             'stock' => 'required|integer|max:999999',

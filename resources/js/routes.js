@@ -82,9 +82,9 @@ export const routes = [
         }
     },
     {
-        path: '/clients',
-        name: 'clients',
-        component: require('./components/modules/client/ClientListComponent').default,
+        path: '/customers',
+        name: 'customers',
+        component: require('./components/modules/customer/CustomerListComponent').default,
         meta: {
             breadcrumb: [
                 { name: 'Home', link: '/home' },

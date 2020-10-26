@@ -104,7 +104,7 @@
                     </div>
                 </div>
 
-                <!-- <product-form-add-edit ref="productFormAddEdit" @updateProductList="updateProductList"></product-form-add-edit> -->
+                <order-form-add-edit ref="orderFormAddEdit" @updateOrderList="updateOrderList"></order-form-add-edit>
 
             </div>
 
@@ -114,11 +114,10 @@
 </template>
 
 <script>
-/* import Multiselect from 'vue-multiselect';
-import ProductFormAddEdit from './ProductFormAddEditComponent'; */
+import OrderFormAddEdit from './OrderFormAddEditComponent';
 
 export default {
-    //components: {Multiselect,ProductFormAddEdit},
+    components: {OrderFormAddEdit},
     created() {
         this.getOrders();
     },
@@ -173,9 +172,9 @@ export default {
             };
         },
         openModalAddEdit(action, product = null) {
-            //this.$refs.productFormAddEdit.showForm(action, product);
+            this.$refs.orderFormAddEdit.showForm(action, product);
         },
-        updateProductList(action = null) {
+        updateOrderList(action = null) {
             //this.getProducts(this.products.current_page ?? 1 );
         },
 
@@ -188,7 +187,6 @@ export default {
     },
 
 }
-/* <style src="vue-multiselect/dist/vue-multiselect.min.css"></style> */
 </script>
 
 

@@ -48,7 +48,7 @@
                     </li>
 
                     <!-- OPERACIONES -->
-                    <template v-if="userPermissions.includes('orders.index', 'clients.index')">
+                    <template v-if="userPermissions.includes('orders.index', 'customers.index')">
                         <li class="nav-header">OPERACIONES</li>
                         <li class="nav-item">
                             <router-link v-if="userPermissions.includes('orders.index')" :to="{path: '/orders'}"
@@ -58,8 +58,8 @@
                             </router-link>
                         </li>
                         <li class="nav-item">
-                            <router-link v-if="userPermissions.includes('clients.index')" :to="{path: '/clients'}"
-                                :class="['nav-link', isActive('/clients') ? 'active' : '']">
+                            <router-link v-if="userPermissions.includes('customers.index')" :to="{path: '/customers'}"
+                                :class="['nav-link', isActive('/customers') ? 'active' : '']">
                                     <i class="nav-icon fas fa-user-friends"></i>
                                     <p>Clientes</p>
                             </router-link>

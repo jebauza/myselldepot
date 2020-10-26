@@ -30,7 +30,7 @@ class CategoryStoreUpdateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('roles', 'name')->ignore($category_id)
+                Rule::unique('categories', 'name')->ignore($category_id)
             ],
             'description' => 'nullable|string'
         ];
