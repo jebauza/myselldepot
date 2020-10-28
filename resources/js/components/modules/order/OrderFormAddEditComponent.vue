@@ -115,7 +115,7 @@
                                                 </template>
                                             </vs-tooltip>
 
-                                            <table class="table table-sm">
+                                            <table class="table table-hover table-sm">
                                                 <thead>
                                                     <tr class="bg-dark">
                                                         <th>#</th>
@@ -127,11 +127,11 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr v-for="(p, index) in listCheckProducts" :key="index+1">
+                                                    <tr v-for="(p, index) in listCheckProducts" :key="index">
                                                         <th>{{ index+1 }}</th>
                                                         <td>
-                                                            <el-select v-model="p.id" filterable placeholder="Select" size="small">
-                                                                <el-option v-for="product in filterProducts"
+                                                            <el-select @change="selectProduct(p.id, index)" v-model="p.id" filterable placeholder="Select" size="small">
+                                                                <el-option v-for="product in all_products"
                                                                     :key="product.id"
                                                                     :label="product.name"
                                                                     :value="product.id">
@@ -139,21 +139,32 @@
                                                             </el-select>
                                                         </td>
                                                         <td>
-                                                            <el-input-number v-model="p.stock" size="small"
+                                                            <el-input-number @change="selectProduct(p.id, index)" v-model="p.stock" size="small"
                                                                 controls-position="right"
-                                                                :min="1">
+                                                                :min="1"
+                                                                :max="p.maxStock ? p.maxStock : 1">
                                                             </el-input-number>
                                                         </td>
-                                                        <td v-text="p.price"></td>
-                                                        <td v-text="p.subTotal"></td>
-                                                        <td>
-                                                            <button @click="removeProduct(index)" class="btn btn-flat btn-danger btn-xs">
+                                                        <td class="text-center">{{ p.price ? '$ '+p.price : '' }}</td>
+                                                        <td class="text-center">{{ p.subTotal ? '$ '+p.subTotal : '' }}</td>
+                                                        <td class="text-center">
+                                                            <el-tooltip class="item" effect="dark" content="Remover Producto" placement="bottom">
+                                                                <button @click="removeProduct(index)" class="btn btn-flat btn-danger btn-xs">
                                                                     <i class="fas fa-trash"></i>
-                                                            </button>
+                                                                </button>
+                                                            </el-tooltip>
                                                         </td>
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <el-row :gutter="20">
+                                                <el-col :span="16">
+                                                    <vs-input border v-model="form.coment" placeholder="Comentario" />
+                                                </el-col>
+                                                <el-col :span="8">
+                                                    <strong>Total:</strong> <span v-if="totalOrder">$ {{ form.total = totalOrder }}</span>
+                                                </el-col>
+                                            </el-row>
                                         </div>
 
                                     </div>
@@ -196,7 +207,9 @@ export default {
                     email: '',
                     phone: '',
                     id: ''
-                }
+                },
+                coment: '',
+                total: 0
             },
             errors: {},
 
@@ -224,7 +237,7 @@ export default {
             });
         },
         querySearch(queryString, cb) {
-            let links = []
+            let links = [];
             this.all_customers.map(customer => {
                     links.push({
                         value: customer.document,
@@ -316,18 +329,57 @@ export default {
 
         },
         addProduct() {
-            if(this.listCheckProducts.length < this.all_products.length) {
+            let isRowsCompleted = true;
+            this.listCheckProducts.map(p => {
+                if(!p.id || !p.stock || !p.price || !p.subTotal) {
+                    isRowsCompleted = false;
+                }
+            });
+
+            if(this.listCheckProducts.length < this.all_products.length && isRowsCompleted) {
                 this.listCheckProducts.push({
                     id: '',
                     stock: 1,
+                    maxStock: '',
                     price: '',
                     subTotal: ''
+                });
+            }else {
+                this.$vs.notification({
+                    square: true,
+                    color: 'warn',
+                    position: 'top-right',
+                    title: !isRowsCompleted ? 'Hay datos incompletos en los productos seleccionados'
+                                            : 'Ha seleccionado ya todos los productos existentes'
                 });
             }
         },
         removeProduct(index) {
-            this.$delete(this.listCheckProducts, index)
+            this.$delete(this.listCheckProducts, index);
         },
+        selectProduct(product_id, index) {
+            const productSelectIndex = this.listCheckProducts.findIndex(prod => prod.id == product_id);
+            const product = this.all_products.find(p => p.id == product_id);
+
+            if(productSelectIndex !== -1 && productSelectIndex != index) {
+                this.$vs.notification({
+                    square: true,
+                    color: 'warn',
+                    position: 'top-right',
+                    title: `La fila número ${productSelectIndex + 1} ya contiene el producto "${product.name}"`
+                });
+                this.listCheckProducts[index].id = '';
+                this.listCheckProducts[index].stock = 1;
+                this.listCheckProducts[index].maxStock = '';
+                this.listCheckProducts[index].price = '';
+                this.listCheckProducts[index].subTotal = '';
+            }else if(product){
+                this.listCheckProducts[index].price = product.price;
+                this.listCheckProducts[index].maxStock = product.stock;
+                this.listCheckProducts[index].subTotal = parseFloat(Math.round((product.price * this.listCheckProducts[index].stock) * 100) / 100).toFixed(2);
+            }
+        },
+
         actionStoreUpdate() {
             //this.fullscreenLoading = true;
             if(this.modalType == 'add') {
@@ -421,11 +473,10 @@ export default {
         }
     },
     computed: {
-        filterProducts() {
-            return this.all_products.filter(p => {
-                let isCheck = this.listCheckProducts.find(element => element.id == p.id);
-                return isCheck ? false : true;
-            })
+        totalOrder() {
+            return this.listCheckProducts.reduce((oldValue, newValue) => {
+                return parseFloat(oldValue) + parseFloat(newValue.subTotal);
+            }, 0);
         }
     },
 }
@@ -440,6 +491,33 @@ export default {
 .vs-tooltip-content {
     width: min-content !important;
 }
+
+.el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .el-col {
+    border-radius: 4px;
+  }
+  .bg-purple-dark {
+    background: #99a9bf;
+  }
+  .bg-purple {
+    background: #d3dce6;
+  }
+  .bg-purple-light {
+    background: #e5e9f2;
+  }
+  .grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+  }
+  .row-bg {
+    padding: 10px 0;
+    background-color: #f9fafc;
+  }
 
 </style>
 
