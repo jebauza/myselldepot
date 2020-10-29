@@ -68,7 +68,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', 'CMS\Api\OrderCmsApiController@index')->middleware('permission:orders.index')->name('index');
             Route::post('/store', 'CMS\Api\OrderCmsApiController@store')->middleware('permission:orders.store')->name('store');
-            Route::put('/{category_id}/update', 'CMS\Api\OrderCmsApiController@update')->middleware('permission:orders.update')->name('update');
+            Route::put('/{order_id}/update', 'CMS\Api\OrderCmsApiController@update')->middleware('permission:orders.update')->name('update');
         });
 
         /* CUSTOMERS */

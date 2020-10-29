@@ -81,7 +81,7 @@
                                                         </div>
 
                                                         <div v-if="switch_newcustomer" class="form-group col-12">
-                                                            <button type="submit" class="btn btn-primary btn-sm btn-block">Registrar</button>
+                                                            <button type="submit" class="btn btn-primary btn-sm btn-block">Registrar Cliente</button>
                                                         </div>
                                                     </template>
 
@@ -115,56 +115,62 @@
                                                 </template>
                                             </vs-tooltip>
 
-                                            <table class="table table-hover table-sm">
-                                                <thead>
-                                                    <tr class="bg-dark">
-                                                        <th>#</th>
-                                                        <th>Artículo</th>
-                                                        <th>Stock</th>
-                                                        <th>Precio</th>
-                                                        <th>SubTotal</th>
-                                                        <th>Acción</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(p, index) in listCheckProducts" :key="index">
-                                                        <th>{{ index+1 }}</th>
-                                                        <td>
-                                                            <el-select @change="selectProduct(p.id, index)" v-model="p.id" filterable placeholder="Select" size="small">
-                                                                <el-option v-for="product in all_products"
-                                                                    :key="product.id"
-                                                                    :label="product.name"
-                                                                    :value="product.id">
-                                                                </el-option>
-                                                            </el-select>
-                                                        </td>
-                                                        <td>
-                                                            <el-input-number @change="selectProduct(p.id, index)" v-model="p.stock" size="small"
-                                                                controls-position="right"
-                                                                :min="1"
-                                                                :max="p.maxStock ? p.maxStock : 1">
-                                                            </el-input-number>
-                                                        </td>
-                                                        <td class="text-center">{{ p.price ? '$ '+p.price : '' }}</td>
-                                                        <td class="text-center">{{ p.subTotal ? '$ '+p.subTotal : '' }}</td>
-                                                        <td class="text-center">
-                                                            <el-tooltip class="item" effect="dark" content="Remover Producto" placement="bottom">
-                                                                <button @click="removeProduct(index)" class="btn btn-flat btn-danger btn-xs">
-                                                                    <i class="fas fa-trash"></i>
-                                                                </button>
-                                                            </el-tooltip>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <el-row :gutter="20">
-                                                <el-col :span="16">
-                                                    <vs-input border v-model="form.coment" placeholder="Comentario" />
-                                                </el-col>
-                                                <el-col :span="8">
-                                                    <strong>Total:</strong> <span v-if="totalOrder">$ {{ form.total = totalOrder }}</span>
-                                                </el-col>
-                                            </el-row>
+                                            <template v-if="listCheckProducts.length">
+                                                <table class="table table-hover table-sm">
+                                                    <thead>
+                                                        <tr class="bg-dark">
+                                                            <th>#</th>
+                                                            <th>Artículo</th>
+                                                            <th>Cantidad</th>
+                                                            <th>Precio</th>
+                                                            <th>SubTotal</th>
+                                                            <th>Acción</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="(p, index) in listCheckProducts" :key="index">
+                                                            <th>{{ index+1 }}</th>
+                                                            <td>
+                                                                <el-select @change="selectProduct(p.id, index)" v-model="p.id" filterable placeholder="Select" size="small">
+                                                                    <el-option v-for="product in all_products"
+                                                                        :key="product.id"
+                                                                        :label="product.name"
+                                                                        :value="product.id">
+                                                                    </el-option>
+                                                                </el-select>
+                                                            </td>
+                                                            <td>
+                                                                <el-input-number @change="selectProduct(p.id, index)" v-model="p.quantity" size="small"
+                                                                    controls-position="right"
+                                                                    :min="1"
+                                                                    :max="p.maxStock ? p.maxStock : 1">
+                                                                </el-input-number>
+                                                            </td>
+                                                            <td class="text-center">{{ p.price ? '$ '+p.price : '' }}</td>
+                                                            <td class="text-center">{{ p.subTotal ? '$ '+p.subTotal : '' }}</td>
+                                                            <td class="text-center">
+                                                                <el-tooltip class="item" effect="dark" content="Remover Producto" placement="bottom">
+                                                                    <button @click="removeProduct(index)" class="btn btn-flat btn-danger btn-xs">
+                                                                        <i class="fas fa-trash"></i>
+                                                                    </button>
+                                                                </el-tooltip>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <el-row :gutter="20">
+                                                    <el-col :span="16">
+                                                        <vs-input border v-model="form.comments" placeholder="Comentarios" />
+                                                    </el-col>
+                                                    <el-col :span="8">
+                                                        <strong>Total:</strong> <span v-if="totalOrder">$ {{ form.total = totalOrder }}</span>
+                                                    </el-col>
+                                                </el-row>
+                                            </template>
+                                            <div v-else class="alert alert-warning mx-2 text-center" style="margin-top: 18px;">
+                                                No se ha adicionado ningún producto a la orden
+                                            </div>
+
                                         </div>
 
                                     </div>
@@ -176,7 +182,11 @@
                     </div>
                     <div class="modal-footer justify-content-between">
                         <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                        <button type="submit" class="btn btn-primary" v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
+                        <button v-if="totalOrder > 0 && listCheckProducts.length && form.customer.id"
+                            @click.prevent="actionStoreUpdate()"
+                            type="button"
+                            class="btn btn-primary"
+                            v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
                     </div>
 
             </div>
@@ -208,7 +218,7 @@ export default {
                     phone: '',
                     id: ''
                 },
-                coment: '',
+                comments: '',
                 total: 0
             },
             errors: {},
@@ -271,6 +281,7 @@ export default {
         showForm(action, order = null) {
             if(this.modalType != action) {
                 this.clearFormCustomer();
+                this.clearProducts();
             }
             this.modalType = action;
             if(this.modalType === 'edit' && order) {
@@ -287,6 +298,7 @@ export default {
             $('#modalOrderFormAddEdit').modal('show');
         },
         storeCustomer() {
+            this.fullscreenLoading = true;
             const url = '/cmsapi/operation/customers/store';
             if(this.validator()) {
                 axios.post(url, this.form.customer)
@@ -331,7 +343,7 @@ export default {
         addProduct() {
             let isRowsCompleted = true;
             this.listCheckProducts.map(p => {
-                if(!p.id || !p.stock || !p.price || !p.subTotal) {
+                if(!p.id || !p.quantity || !p.price || !p.subTotal) {
                     isRowsCompleted = false;
                 }
             });
@@ -339,7 +351,7 @@ export default {
             if(this.listCheckProducts.length < this.all_products.length && isRowsCompleted) {
                 this.listCheckProducts.push({
                     id: '',
-                    stock: 1,
+                    quantity: 1,
                     maxStock: '',
                     price: '',
                     subTotal: ''
@@ -358,7 +370,7 @@ export default {
             this.$delete(this.listCheckProducts, index);
         },
         selectProduct(product_id, index) {
-            const productSelectIndex = this.listCheckProducts.findIndex(prod => prod.id == product_id);
+            const productSelectIndex = this.listCheckProducts.findIndex((prod, i) => (prod.id == product_id && i != index));
             const product = this.all_products.find(p => p.id == product_id);
 
             if(productSelectIndex !== -1 && productSelectIndex != index) {
@@ -369,29 +381,38 @@ export default {
                     title: `La fila número ${productSelectIndex + 1} ya contiene el producto "${product.name}"`
                 });
                 this.listCheckProducts[index].id = '';
-                this.listCheckProducts[index].stock = 1;
+                this.listCheckProducts[index].quantity = 1;
                 this.listCheckProducts[index].maxStock = '';
                 this.listCheckProducts[index].price = '';
                 this.listCheckProducts[index].subTotal = '';
             }else if(product){
                 this.listCheckProducts[index].price = product.price;
                 this.listCheckProducts[index].maxStock = product.stock;
-                this.listCheckProducts[index].subTotal = parseFloat(Math.round((product.price * this.listCheckProducts[index].stock) * 100) / 100).toFixed(2);
+                this.listCheckProducts[index].subTotal = parseFloat(Math.round((product.price * this.listCheckProducts[index].quantity) * 100) / 100).toFixed(2);
             }
         },
 
         actionStoreUpdate() {
             //this.fullscreenLoading = true;
             if(this.modalType == 'add') {
-                //this.storeProduct();
+                this.storeOrder();
             }else if(this.modalType == 'edit') {
                 //this.updateProduct();
             }
         },
-        /* storeProduct() {
-            const url = '/cmsapi/configuration/products/store';
+        storeOrder() {
+            this.fullscreenLoading = true;
+            const url = '/cmsapi/operation/orders/store';
+            let data = {
+                customer_id: this.form.customer.id,
+                comments: this.form.comments,
+                total: this.form.total,
+                products: [
+                    {id: 1, quantity: 2, price: 10.5}
+                ]
+            }
 
-            axios.post(url, this.form)
+            axios.post(url, data)
             .then(res => {
                 this.fullscreenLoading = false;
                 Swal.fire({
@@ -400,9 +421,9 @@ export default {
                     timer: 1500,
                     showConfirmButton: false
                 });
-                this.$emit('updateProductList', 'add');
-                $('#modalOrderFormAddEdit').modal('hide');
-                this.clearForm();
+                //this.$emit('updateProductList', 'add');
+                //$('#modalOrderFormAddEdit').modal('hide');
+                //this.clearForm();
             }).catch(err => {
                 this.fullscreenLoading = false;
                 if(err.response && err.response.status == 422) {
@@ -418,7 +439,7 @@ export default {
                 }
             });
         },
-        updateProduct() {
+        /* updateProduct() {
             const url = `/cmsapi/configuration/products/${this.form.id}/update`;
 
             axios.put(url, this.form)
@@ -459,8 +480,13 @@ export default {
             };
             this.errors = {};
         },
+        clearProducts() {
+            this.listCheckProducts = [],
+            this.form.comments = '';
+            this.form.total = 0;
+            this.errors = {};
+        },
         validator() {
-
             let isReady = true;
             if(this.switch_newcustomer) {
                 if(!this.form.customer.email || !(/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(this.form.customer.email))) {
@@ -468,7 +494,6 @@ export default {
                     isReady = false;
                 }
             }
-
             return isReady
         }
     },
