@@ -57,6 +57,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\ProductCmsApiController@index')->middleware('permission:products.index')->name('index');
             Route::post('/store', 'CMS\Api\ProductCmsApiController@store')->middleware('permission:products.store')->name('store');
             Route::put('/{product_id}/update', 'CMS\Api\ProductCmsApiController@update')->middleware('permission:products.update')->name('update');
+            Route::get('/get-all-products', 'CMS\Api\ProductCmsApiController@getAllProducts')->name('get-products');
         });
     });
 
@@ -67,7 +68,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
         Route::prefix('orders')->name('orders.')->group(function () {
             Route::get('/', 'CMS\Api\OrderCmsApiController@index')->middleware('permission:orders.index')->name('index');
             Route::post('/store', 'CMS\Api\OrderCmsApiController@store')->middleware('permission:orders.store')->name('store');
-            Route::put('/{category_id}/update', 'CMS\Api\OrderCmsApiController@update')->middleware('permission:orders.update')->name('update');
+            Route::put('/{order_id}/update', 'CMS\Api\OrderCmsApiController@update')->middleware('permission:orders.update')->name('update');
         });
 
         /* CUSTOMERS */

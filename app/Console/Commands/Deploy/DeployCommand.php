@@ -2,9 +2,10 @@
 
 namespace App\Console\Commands\Deploy;
 
-use App\Models\Rol;
 use App\User;
+use App\Models\Rol;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 
 class DeployCommand extends Command
@@ -61,8 +62,17 @@ class DeployCommand extends Command
         $role = Rol::updateOrCreate(['name' => 'Super Admin']);
         $role->syncPermissions($array_permissions);
 
-        if($user_admin = User::where('username','jebauza')->first()) {
-            $user_admin->assignRole($role->name);
+        if(!$user_admin = User::where('username','jebauza')->first()) {
+            $user_admin = factory(User::class)->create([
+                    'email' => 'jebauza@gmail.com',
+                    'firstname' => 'Jorge',
+                    'secondname' => 'Ernesto',
+                    'lastname' => 'Bauza Becerra',
+                    'username' => 'jebauza',
+                    'password' => Hash::make('password'),
+                ]);
         }
+
+        $user_admin->assignRole($role->name);
     }
 }
