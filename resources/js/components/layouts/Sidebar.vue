@@ -48,7 +48,7 @@
                     </li>
 
                     <!-- OPERACIONES -->
-                    <template v-if="userPermissions.includes('orders.index', 'customers.index')">
+                    <template v-if="userPermissions.find(p => p === 'orders.index' || p === 'customers.index')">
                         <li class="nav-header">OPERACIONES</li>
                         <li class="nav-item">
                             <router-link v-if="userPermissions.includes('orders.index')" :to="{path: '/orders'}"
@@ -67,7 +67,7 @@
                     </template>
 
                     <!-- CONFIGURACION -->
-                    <template v-if="userPermissions.includes('categories.index', 'products.index')">
+                    <template v-if="userPermissions.find(p => p === 'categories.index' || p === 'products.index')">
                         <li class="nav-header">CONFIGURACION</li>
                         <li class="nav-item">
                             <router-link v-if="userPermissions.includes('categories.index')" :to="{path: '/categories'}"
@@ -86,7 +86,7 @@
                     </template>
 
                     <!-- ADMINISTRACION -->
-                    <template v-if="userPermissions.includes('users.index', 'roles.index')">
+                    <template v-if="userPermissions.find(p => p === 'users.index' || p === 'roles.index')">
                         <li class="nav-header">ADMINISTRACION</li>
                         <li v-if="userPermissions.includes('users.index')" class="nav-item">
                             <router-link :to="{path: '/users'}" :class="['nav-link', isActive('/users') ? 'active' : '']">

@@ -65,15 +65,6 @@ class UserCmsApiController extends Controller
         }
     }
 
-    public function show(Request $request, $id)
-    {
-        if($user = User::find($id)) {
-            return $user;
-        }
-
-        return response()->json(['msg_error' => __('Not found')], 404);
-    }
-
     public function update(UserStoreUpdateRequest $request, $id)
     {
         $path = null;
@@ -153,6 +144,15 @@ class UserCmsApiController extends Controller
         }
 
         return response()->json(['msg_error' => __('Internal Server Error')], 500);
+    }
+
+    public function show(Request $request, $id)
+    {
+        if($user = User::find($id)) {
+            return $user;
+        }
+
+        return response()->json(['msg_error' => __('Not found')], 404);
     }
 
     public function getPermissions(Request $request, $id)

@@ -2,6 +2,7 @@
 
 use App\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 
 class UsersTableSeeder extends Seeder
 {
@@ -20,7 +21,7 @@ class UsersTableSeeder extends Seeder
                 'lastname' => 'Bauza Becerra',
                 'username' => 'jebauza',
                 'email_verified_at' => now(),
-                'password' => '$2y$10$RH/Uxs8A3Pn/TR3ghcLzbOM6UIPNFISybQD9JvX4luEL2wso9/J2S', // secret
+                'password' => Hash::make('password'),
                 'remember_token' => Str::random(10),
                 'created_by' => 1,
                 'updated_by' => 1,

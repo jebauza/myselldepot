@@ -39,6 +39,7 @@ class UserStoreUpdateRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
+                'email',
                 Rule::unique('users', 'email')->ignore($user_id)
             ],
             'password' => ($user_id ? 'nullable' : 'required') . '|string|min:8|max:255',
