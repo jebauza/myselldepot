@@ -78,4 +78,16 @@ class LoginTest extends TestCase
 
         $this->assertAuthenticatedAs($user);
     }
+
+    /** @test */
+    public function get_cmsapi_not_ajax_request_error()
+    {
+        $auth_user = factory(User::class)->create(['password' => Hash::make('password')]);
+
+        $response = $this->actingAs($auth_user)->getJson(route('cmsapi.auth.get-refresh-auth-user'));
+
+        $response->assertStatus(302);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
 }

@@ -262,32 +262,222 @@ class UserTest extends TestCase
     }
 
     /** @test */
-    public function post_user_set_state_ok()
+    public function put_user_set_state_activate_ok()
     {
         Artisan::call('launch:deploy');
         $auth_user = factory(User::class)->create();
-        $auth_user->syncPermissions(['users.activate', '']);
+        $auth_user->syncPermissions(['users.activate']);
+
+        $update_user = factory(User::class)->create(['state' => 'I']);
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => $update_user->id]), [
+                        'state' => 'A'
+                    ]);
+
+        $update_user->refresh();
+        $response->assertStatus(200)
+                ->assertJson([
+                    'msg' => __('User :state successfully', ['state'=>__($update_user->state == 'A' ? 'activated' : 'deactivated')]),
+                    'user' => $update_user->toArray()
+                ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => $update_user->email,
+            'state' => 'A'
+        ]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function put_user_set_state_deactivate_ok()
+    {
+        Artisan::call('launch:deploy');
+        $auth_user = factory(User::class)->create();
+        $auth_user->syncPermissions(['users.deactivate']);
+
+        $update_user = factory(User::class)->create(['state' => 'A']);
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => $update_user->id]), [
+                        'state' => 'I'
+                    ]);
+
+        $update_user->refresh();
+        $response->assertStatus(200)
+                ->assertJson([
+                    'msg' => __('User :state successfully', ['state'=>__($update_user->state == 'A' ? 'activated' : 'deactivated')]),
+                    'user' => $update_user->toArray()
+                ]);
+
+        $this->assertDatabaseHas('users', [
+            'email' => $update_user->email,
+            'state' => 'I'
+        ]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function put_user_set_state_permission_error()
+    {
+        $auth_user = factory(User::class)->create();
 
         $update_user = factory(User::class)->create();
         $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
-                    ->postJson(route('cmsapi.user.update', ['user_id' => $update_user->id]), [
-                        'firstname' => $update_user->firstname,
-                        'secondname' => $update_user->secondname,
-                        'lastname' => $update_user->lastname,
-                        'username' => 'username_new',
-                        'email' => 'email_new@test.com'
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => $update_user->id]), [
+                        'state' => 'I'
                     ]);
 
-        //dd($response->getData());
+        $response->assertStatus(403)
+                ->assertJsonStructure([
+                    'message'
+                ]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function put_user_set_state_validate_error()
+    {
+        Artisan::call('launch:deploy');
+        $auth_user = factory(User::class)->create();
+        $auth_user->syncPermissions(['users.deactivate']);
+
+        $update_user = factory(User::class)->create(['state' => 'A']);
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => $update_user->id]), [
+                        'state' => 'Q'
+                    ]);
+
+        $response->assertStatus(422)
+                ->assertJsonStructure([
+                    'message',
+                    'errors' => [
+                        'state'
+                    ]
+                ]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function put_user_set_state_can_activate_gate_error()
+    {
+        Artisan::call('launch:deploy');
+        $auth_user = factory(User::class)->create();
+        $auth_user->syncPermissions(['users.deactivate']);
+
+        $update_user = factory(User::class)->create(['state' => 'I']);
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => $update_user->id]), [
+                        'state' => 'A'
+                    ]);
+
+        $response->assertStatus(403)
+                ->assertJson(['msg_error' => __('Forbidden access')]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function put_user_set_state_can_deactivate_gate_error()
+    {
+        Artisan::call('launch:deploy');
+        $auth_user = factory(User::class)->create();
+        $auth_user->syncPermissions(['users.activate']);
+
+        $update_user = factory(User::class)->create(['state' => 'A']);
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => $update_user->id]), [
+                        'state' => 'I'
+                    ]);
+
+        $response->assertStatus(403)
+                ->assertJson(['msg_error' => __('Forbidden access')]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function put_user_set_state_missing_user_id_error()
+    {
+        Artisan::call('launch:deploy');
+        $auth_user = factory(User::class)->create();
+        $auth_user->syncPermissions(['users.activate']);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                    ->putJson(route('cmsapi.user.set-state', ['user_id' => ($auth_user->id+100)]), [
+                        'state' => 'A'
+                    ]);
+
+        $response->assertStatus(404)
+                ->assertJson(['msg_error' => __('No encontrado')]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function get_user_show_ok()
+    {
+        $auth_user = factory(User::class)->create();
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                        ->json('GET', route('cmsapi.user.show', ['user_id' => $auth_user->id]));
 
         $response->assertStatus(200)
-                ->assertJson(['msg' => __('Save successfully')])
-                ->assertJsonStructure(['msg', 'user']);
+                ->assertJson([
+                    'id' => $auth_user->id,
+                    'firstname' => $auth_user->firstname,
+                    'secondname' => $auth_user->secondname,
+                    'lastname' => $auth_user->lastname,
+                    'username' => $auth_user->username,
+                    'email' => $auth_user->email,
+                    'state' => $auth_user->state,
+                ]);
 
-        $this->assertDatabaseHas('users', [
-            'username' => 'username_new',
-            'email' => 'email_new@test.com'
-        ]);
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function get_user_show_missing_user_id_error()
+    {
+        $auth_user = factory(User::class)->create();
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                        ->json('GET', route('cmsapi.user.show', ['user_id' => ($auth_user->id + 100)]));
+
+        $response->assertStatus(404)
+                ->assertJson(['msg_error' => __('Not found')]);
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function get_user_get_permissions_ok()
+    {
+        Artisan::call('launch:deploy');
+        $auth_user = factory(User::class)->create();
+        $auth_user->syncPermissions(['users.index', 'users.store']);
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                        ->json('GET', route('cmsapi.user.get-permissions', ['user_id' => $auth_user->id]));
+
+        $response->assertStatus(200)
+                ->assertJson($auth_user->getAllPermissions()->toArray());
+
+        $this->assertAuthenticatedAs($auth_user);
+    }
+
+    /** @test */
+    public function get_user_get_permissions_missing_user_id_error()
+    {
+        $auth_user = factory(User::class)->create();
+
+        $response = $this->withHeaders(['X-Requested-With' => 'XMLHttpRequest',])->actingAs($auth_user)
+                        ->json('GET', route('cmsapi.user.get-permissions', ['user_id' => ($auth_user->id + 100)]));
+
+        $response->assertStatus(404)
+                ->assertJson(['msg_error' => __('Not found')]);
 
         $this->assertAuthenticatedAs($auth_user);
     }

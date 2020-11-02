@@ -160,7 +160,7 @@ class UserCmsApiController extends Controller
         if($user = User::find($id)) {
             return $user->getAllPermissions();
         }else {
-            return response()->json(['msg_error' => __('No encontrado')], 404);
+            return response()->json(['msg_error' => __('Not found')], 404);
         }
 
         return response()->json(['msg_error' => __('Internal Server Error')], 500);
