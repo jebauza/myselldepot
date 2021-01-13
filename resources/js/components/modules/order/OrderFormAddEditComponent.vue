@@ -102,7 +102,7 @@
 
                                         <div class="card-body table-responsive">
 
-                                            <vs-tooltip not-arrow right>
+                                            <vs-tooltip v-if="all_products.length" not-arrow right>
                                                 <vs-button border @click.prevent="addProduct()"
                                                     square
                                                     icon
@@ -161,6 +161,9 @@
                                                 <el-row :gutter="20">
                                                     <el-col :span="16">
                                                         <vs-input border v-model="form.comments" placeholder="Comentarios" />
+                                                        <small v-if="errors.comments" class="form-control-feedback text-danger">
+                                                            {{ errors.comments[0] }}
+                                                        </small>
                                                     </el-col>
                                                     <el-col :span="8">
                                                         <strong>Total:</strong> <span v-if="totalOrder">$ {{ form.total = totalOrder }}</span>
@@ -407,9 +410,7 @@ export default {
                 customer_id: this.form.customer.id,
                 comments: this.form.comments,
                 total: this.form.total,
-                products: [
-                    {id: 1, quantity: 2, price: 10.5}
-                ]
+                products: this.listCheckProducts
             }
 
             axios.post(url, data)
@@ -421,13 +422,16 @@ export default {
                     timer: 1500,
                     showConfirmButton: false
                 });
-                //this.$emit('updateProductList', 'add');
-                //$('#modalOrderFormAddEdit').modal('hide');
-                //this.clearForm();
+                $('#modalOrderFormAddEdit').modal('hide');
+                this.clearForm();
+                this.clearProducts();
+                this.$emit('updateOrderList', 'add');
             }).catch(err => {
                 this.fullscreenLoading = false;
                 if(err.response && err.response.status == 422) {
+
                     this.errors = err.response.data.errors;
+                    console.log( err.response.data.errors);
                 }else if(err.response.data.msg_error || err.response.data.message) {
                     Swal.fire({
                         title: 'Error!',
@@ -519,9 +523,6 @@ export default {
 
 .el-row {
     margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
   .el-col {
     border-radius: 4px;

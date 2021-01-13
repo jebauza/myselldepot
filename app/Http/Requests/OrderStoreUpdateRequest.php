@@ -28,8 +28,10 @@ class OrderStoreUpdateRequest extends FormRequest
             'customer_id' => 'required|integer|exists:customers,id',
             'comments' => 'required|string',
             'total' => 'required|numeric',
-            'products' => 'required|array|min:1',
-            'products.*.id' => 'required|integer|exists:customers,id'
+            'products' => 'bail|required|array|min:1',
+            'products.*.id' => 'required|integer|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.price' => 'required|numeric',
         ];
     }
 }

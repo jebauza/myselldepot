@@ -77,20 +77,20 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(order) in orders.data" :key="order.id">
-                                        <td v-text="order.pedido"></td>
-                                        <td v-text="order.documento"></td>
-                                        <td v-text="order.cliente"></td>
+                                        <td v-text="order.order_number"></td>
+                                        <td v-text="order.customer.document"></td>
+                                        <td>{{`${order.customer.name} ${order.customer.lastname}`}}</td>
                                         <td v-text="order.total"></td>
-                                        <td v-text="order.vendedor"></td>
-                                        <td v-text="order.estado"></td>
+                                        <td v-text="order.seller.fullName"></td>
+                                        <td v-text="order.state"></td>
                                         <td>
                                             <button v-if="authUserPermissions.includes('orders.show')"
                                                 class="btn btn-flat btn-info btn-xs" title="Ver PDF">
                                                 <i class="fas fa-file-pdf"></i>
                                             </button>
                                             <button v-if="authUserPermissions.includes('orders.reject')"
-                                                class="btn btn-flat btn-danger btn-xs" title="Ver PDF">
-                                                <i class="far fa-trash"></i>
+                                                class="btn btn-flat btn-danger btn-xs" title="Rechazar">
+                                                <i class="fas fa-trash"></i>
                                             </button>
                                         </td>
                                     </tr>
@@ -175,7 +175,7 @@ export default {
             this.$refs.orderFormAddEdit.showForm(action, product);
         },
         updateOrderList(action = null) {
-            //this.getProducts(this.products.current_page ?? 1 );
+            this.getOrders(this.orders.current_page ?? 1 );
         },
 
     },

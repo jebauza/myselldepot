@@ -18,7 +18,7 @@ class CreateProductsTable extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->smallInteger('stock')->default(1);
-            $table->double('price', 4, 2)->default(10.50);
+            $table->double('price', 11, 2)->default(10.50);
 
             $table->bigInteger('categorie_id')->unsigned()->nullable();
             $table->foreign('categorie_id')->references('id')->on('categories')->onDelete('set null');

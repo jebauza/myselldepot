@@ -21,9 +21,11 @@ class CreateDetailsOrdersTable extends Migration
             $table->bigInteger('product_id')->unsigned()->required();
             $table->foreign('product_id')->references('id')->on('products');
 
-            $table->smallInteger('quantity')->nullable()->default(12);
-            $table->smallInteger('price')->nullable()->default(12);
+            $table->smallInteger('quantity');
+            $table->double('price', 11, 2);
             $table->timestamps();
+
+            $table->unique(['order_id', 'product_id']);
         });
     }
 

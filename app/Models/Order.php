@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\User;
+use App\Models\Product;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -55,5 +56,11 @@ class Order extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'details_orders', 'order_id', 'product_id')
+                    ->withPivot('order_id','product_id','quantity','price')->withTimestamps();
     }
 }
