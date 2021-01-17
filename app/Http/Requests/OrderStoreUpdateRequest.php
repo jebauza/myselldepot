@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Product;
 use Illuminate\Foundation\Http\FormRequest;
 
 class OrderStoreUpdateRequest extends FormRequest
@@ -33,5 +34,33 @@ class OrderStoreUpdateRequest extends FormRequest
             'products.*.quantity' => 'required|integer|min:1',
             'products.*.price' => 'required|numeric',
         ];
+    }
+
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if(empty($validator->errors()->all())){
+                $this->checkProductStock($validator);
+            }
+        });
+    }
+
+    public function checkProductStock($validator)
+    {
+        $productsCollect = collect($this->products);
+        $productsDB = Product::whereIn('id', $productsCollect->pluck('id'))->get();
+        foreach ($productsDB as $prodDB) {
+            $quantity = $productsCollect->firstWhere('id', $prodDB->id)['quantity'];
+            if (!$prodDB->hasInStock($quantity)) {
+                $validator->errors()->add('msg_error_validator', __("There are no :quantity units of :product in stock", [
+                    'product' => $prodDB->name,
+                    'quantity' => $quantity
+                ]));
+                break;
+            } elseif ($productsCollect->where('id', $prodDB->id)->count() > 1) {
+                $validator->errors()->add('msg_error_validator', __("There is a mistake with the :product", ['product'=>$prodDB->name]));
+                break;
+            }
+        }
     }
 }

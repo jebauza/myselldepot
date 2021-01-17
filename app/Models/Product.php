@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Order;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pivots\DetailsOrdersPivot;
 
 class Product extends Model
 {
@@ -43,6 +44,23 @@ class Product extends Model
     public function orders()
     {
         return $this->belongsToMany(Order::class, 'details_orders', 'product_id', 'order_id')
-                    ->withPivot('order_id','product_id','quantity','price')->withTimestamps();;
+                    ->using(DetailsOrdersPivot::class)
+                    ->withPivot('order_id','product_id','quantity','price')->withTimestamps();
+    }
+
+    // Methods
+    public function addOrSubtractStock($operation, $value) {
+
+        if ($operation === '+') {
+            $this->stock = $this->stock + $value;
+        } elseif ($operation === '-') {
+            $this->stock = $this->stock - $value;
+        }
+
+        $this->save();
+    }
+
+    public function hasInStock($value) {
+        return (($this->stock - $value) > -1);
     }
 }

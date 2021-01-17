@@ -48,7 +48,7 @@ class OrderCmsApiController extends Controller
                 }
 
                 DB::commit();
-                return response()->json(['msg'=>__('Save successfully'), 'order'=>$new_order->refresh()], 201);
+                return response()->json(['msg'=>__('Save successfully'), 'order'=>$new_order], 201);
             }
 
         } catch (\Exception $e) {
