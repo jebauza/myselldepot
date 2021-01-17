@@ -3,8 +3,11 @@
 namespace App\Models;
 
 use App\User;
+use App\Models\Product;
 use App\Models\Customer;
+use App\Events\Order\OrderSavedEvent;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Pivots\DetailsOrdersPivot;
 use Illuminate\Database\Eloquent\Builder;
 
 class Order extends Model
@@ -55,5 +58,12 @@ class Order extends Model
     public function seller()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
+    }
+
+    public function products()
+    {
+        return $this->belongsToMany(Product::class, 'details_orders', 'order_id', 'product_id')
+                    ->using(DetailsOrdersPivot::class)
+                    ->withPivot('order_id','product_id','quantity','price')->withTimestamps();
     }
 }

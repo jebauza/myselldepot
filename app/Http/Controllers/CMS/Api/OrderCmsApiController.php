@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers\CMS\Api;
 
+use Carbon\Carbon;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\OrderStoreUpdateRequest;
 
@@ -11,15 +13,48 @@ class OrderCmsApiController extends Controller
 {
     public function index(Request $request)
     {
-        $orders = Order::customerName($request->name)->customerDocument($request->document)->orderNumber($request->order)
-                        ->state($request->state)->orderBy('order_number', 'DESC')->paginate();
+        $orders = Order::customerName($request->name)
+                        ->customerDocument($request->document)
+                        ->orderNumber($request->order)
+                        ->state($request->state)
+                        ->with('customer', 'seller', 'products')
+                        ->orderBy('order_number', 'DESC')
+                        ->paginate();
 
         return $orders;
     }
 
     public function store(OrderStoreUpdateRequest $request)
     {
-        dd($request->all());
+        $order_number = Carbon::today()->format('Ymd').'_'.(Order::whereDate('created_at', Carbon::today())->count() + 1);
+        $auth_user = $request->user();
+
+        try {
+            DB::beginTransaction();
+            $new_order = new Order($request->all());
+            $new_order->order_number = $order_number;
+            $new_order->user_id = $auth_user->id;
+            $new_order->created_by = $auth_user->id;
+            $new_order->updated_by = $auth_user->id;
+            $new_order->state = 'A';
+            $new_order->total = floatval($request->total);
+            if($new_order->save()) {
+
+                foreach ($request->products as $prod) {
+                    $new_order->products()->attach($prod['id'], [
+                        'quantity' => $prod['quantity'],
+                        'price' => $prod['price']
+                    ]);
+                }
+
+                DB::commit();
+                return response()->json(['msg'=>__('Save successfully'), 'order'=>$new_order], 201);
+            }
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['msg_error' => $e->getMessage()], 500);
+        }
     }
 
     /**

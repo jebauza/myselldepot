@@ -102,7 +102,7 @@
 
                                         <div class="card-body table-responsive">
 
-                                            <vs-tooltip not-arrow right>
+                                            <vs-tooltip v-if="all_products.length" not-arrow right>
                                                 <vs-button border @click.prevent="addProduct()"
                                                     square
                                                     icon
@@ -161,6 +161,9 @@
                                                 <el-row :gutter="20">
                                                     <el-col :span="16">
                                                         <vs-input border v-model="form.comments" placeholder="Comentarios" />
+                                                        <small v-if="errors.comments" class="form-control-feedback text-danger">
+                                                            {{ errors.comments[0] }}
+                                                        </small>
                                                     </el-col>
                                                     <el-col :span="8">
                                                         <strong>Total:</strong> <span v-if="totalOrder">$ {{ form.total = totalOrder }}</span>
@@ -370,28 +373,34 @@ export default {
             this.$delete(this.listCheckProducts, index);
         },
         selectProduct(product_id, index) {
+            let msg_error = null;
             const productSelectIndex = this.listCheckProducts.findIndex((prod, i) => (prod.id == product_id && i != index));
             const product = this.all_products.find(p => p.id == product_id);
 
             if(productSelectIndex !== -1 && productSelectIndex != index) {
+                msg_error = `La fila número ${productSelectIndex + 1} ya contiene el producto "${product.name}"`;
+            } else if (product.stock < 1) {
+                msg_error = `El producto selecionado no cuenta con stock disponible`;
+            } else if (product){
+                this.listCheckProducts[index].price = product.price;
+                this.listCheckProducts[index].maxStock = product.stock;
+                this.listCheckProducts[index].subTotal = parseFloat(Math.round((product.price * this.listCheckProducts[index].quantity) * 100) / 100).toFixed(2);
+            }
+
+            if (msg_error) {
                 this.$vs.notification({
                     square: true,
                     color: 'warn',
                     position: 'top-right',
-                    title: `La fila número ${productSelectIndex + 1} ya contiene el producto "${product.name}"`
+                    title: msg_error
                 });
                 this.listCheckProducts[index].id = '';
                 this.listCheckProducts[index].quantity = 1;
                 this.listCheckProducts[index].maxStock = '';
                 this.listCheckProducts[index].price = '';
                 this.listCheckProducts[index].subTotal = '';
-            }else if(product){
-                this.listCheckProducts[index].price = product.price;
-                this.listCheckProducts[index].maxStock = product.stock;
-                this.listCheckProducts[index].subTotal = parseFloat(Math.round((product.price * this.listCheckProducts[index].quantity) * 100) / 100).toFixed(2);
             }
         },
-
         actionStoreUpdate() {
             //this.fullscreenLoading = true;
             if(this.modalType == 'add') {
@@ -407,13 +416,12 @@ export default {
                 customer_id: this.form.customer.id,
                 comments: this.form.comments,
                 total: this.form.total,
-                products: [
-                    {id: 1, quantity: 2, price: 10.5}
-                ]
+                products: this.listCheckProducts
             }
 
             axios.post(url, data)
             .then(res => {
+                this.$emit('updateOrderList', 'add');
                 this.fullscreenLoading = false;
                 Swal.fire({
                     title: res.data.msg,
@@ -421,17 +429,24 @@ export default {
                     timer: 1500,
                     showConfirmButton: false
                 });
-                //this.$emit('updateProductList', 'add');
-                //$('#modalOrderFormAddEdit').modal('hide');
-                //this.clearForm();
+                $('#modalOrderFormAddEdit').modal('hide');
+                this.clearFormCustomer();
+                this.clearProducts();
             }).catch(err => {
                 this.fullscreenLoading = false;
+                let msg_error = null;
                 if(err.response && err.response.status == 422) {
+
                     this.errors = err.response.data.errors;
-                }else if(err.response.data.msg_error || err.response.data.message) {
+                    msg_error = this.errors.msg_error_validator ? this.errors.msg_error_validator[0] : null;
+                } else if(err.response.data.msg_error || err.response.data.message) {
+                     msg_error = err.response.data.msg_error ?? err.response.data.message;
+                }
+
+                if (msg_error) {
                     Swal.fire({
                         title: 'Error!',
-                        text: err.response.data.msg_error ?? err.response.data.message,
+                        text: msg_error,
                         icon: "error",
                         showCloseButton: true,
                         closeButtonColor: 'red',
@@ -519,9 +534,6 @@ export default {
 
 .el-row {
     margin-bottom: 20px;
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
   .el-col {
     border-radius: 4px;

@@ -9,5 +9,8 @@
     "activated": "activado",
     "Successfully authenticated": "Successfully authenticated",
     "Logged out successfully": "Se ha cerrado sesión correctamente",
-    "Forbidden access": "Acceso Prohibido"
+    "Forbidden access": "Acceso Prohibido",
+    "There are no :quantity units of :product in stock": "No existe :quantity unidades de :product en el stock",
+    "There is a mistake with the :product": "Existe un error con el :product"
+
 }
