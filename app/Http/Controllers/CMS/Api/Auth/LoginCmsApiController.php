@@ -19,7 +19,7 @@ class LoginCmsApiController extends Controller
                 'userPermissions' => Auth::user()->getAllPermissions()
             ], 200);
         } else{
-            return response()->json(['errors' => ['email' => [__('auth.failed')]]], 422);
+            return response()->json(['msg_error' => __('auth.failed')], 403);
         }
     }
 

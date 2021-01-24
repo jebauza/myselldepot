@@ -6,7 +6,7 @@ window.Vue = require('vue');
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import locale from 'element-ui/lib/locale/lang/en';
-Vue.use(ElementUI, { locale })
+Vue.use(ElementUI, { locale });
 
 /* SweetAlert2 - Biblioteca para ventanas emergentes */
 import Swal from 'sweetalert2';
@@ -20,7 +20,7 @@ https://www.digitalocean.com/community/tutorials/vuejs-vue-sweetalert2#installat
 import Vuesax from 'vuesax';
 import 'vuesax/dist/vuesax.css';
 Vue.use(Vuesax, {
-// options here
+    // options here
 });
 
 Vue.component('pagination', require('laravel-vue-pagination'));

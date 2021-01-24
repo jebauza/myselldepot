@@ -1,14 +1,13 @@
 <template>
-<div>
-    <Navbar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Navbar>
+    <div>
+        <Navbar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Navbar>
 
-    <Sidebar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Sidebar>
+        <Sidebar :basepath="basepath" :auth_user="authUser" :userPermissions="userPermissions"></Sidebar>
 
-    <Content :basepath="basepath"></Content>
+        <Content :basepath="basepath"></Content>
 
-    <Footer :basepath="basepath"></Footer>
-
-</div>
+        <Footer :basepath="basepath"></Footer>
+    </div>
 </template>
 
 <script>
