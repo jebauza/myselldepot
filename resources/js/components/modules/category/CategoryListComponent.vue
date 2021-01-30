@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <!-- Carga de datos -->
-        <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+        <!-- <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div> -->
 
         <div class="card-header">
             <div class="card-tools">
@@ -55,18 +55,20 @@
                                     <tr>
                                         <th>Nombre</th>
                                         <th>Descripción</th>
-                                        <th>Acciones</th>
+                                        <th class="text-nowrap text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="category in categories.data" :key="category.id">
                                         <td v-text="category.name"></td>
                                         <td v-text="category.description"></td>
-                                        <td>
-                                            <button v-if="authUserPermissions.includes('categories.update')" @click="showForm('edit', category)"
-                                                class="btn btn-flat btn-info btn-xs" title="Editar">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </button>
+                                        <td class="text-nowrap text-center">
+                                            <div>
+                                                <button v-if="authUserPermissions.includes('categories.update')" @click="showForm('edit', category)"
+                                                    class="btn waves-effect waves-light btn-outline-primary btn-sm" title="Editar">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -113,7 +115,7 @@
                                 </div>
                                 <div class="modal-footer justify-content-between">
                                     <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
-                                    <button type="submit" class="btn btn-primary" v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
+                                    <button type="submit" class="btn btn-primary">Guardar</button>
                                 </div>
                             </form>
                         </div>
@@ -157,19 +159,18 @@ export default {
             },
             errors: {},
 
-            fullscreenLoading: false,
-            loaded: false
+            fullscreenLoading: false
         }
     },
     methods: {
         getCategories(page = 1) {
-            this.loaded = false;
+            this.fullscreenLoading = true;
             const url = `/cmsapi/configuration/categories?page=${page}`;
             axios.get(url, {
                 params: this.searches
             }).then(res => {
                 this.categories = res.data;
-                this.loaded = true;
+                this.fullscreenLoading = false;
             })
         },
         clearSearches() {
@@ -209,12 +210,17 @@ export default {
             }
         },
         storeCategory() {
-            this.fullscreenLoading = true;
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = '/cmsapi/configuration/categories/store';
 
             axios.post(url, this.form)
             .then(res => {
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -226,7 +232,7 @@ export default {
                 this.clearForm();
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                 }else if(err.response.data.msg_error || err.response.data.message) {
@@ -238,15 +244,22 @@ export default {
                         closeButtonColor: 'red',
                     });
                 }
-            })
+
+                console.log(err.response);
+            });
         },
         updateCategory() {
-            this.fullscreenLoading = true;
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = `/cmsapi/configuration/categories/${this.form.id}/update`;
 
             axios.put(url, this.form)
             .then(res => {
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -258,7 +271,7 @@ export default {
                 this.clearForm();
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                 }else if(err.response.data.msg_error || err.response.data.message) {
@@ -270,7 +283,9 @@ export default {
                         closeButtonColor: 'red',
                     });
                 }
-            })
+
+                console.log(err.response);
+            });
         }
     },
     computed: {

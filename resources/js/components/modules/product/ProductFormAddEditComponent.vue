@@ -121,7 +121,6 @@ export default {
             $('#modalProductFormAddEdit').modal('show');
         },
         actionStoreUpdate() {
-            this.fullscreenLoading = true;
             if(this.modalType == 'add') {
                 this.storeProduct();
             }else if(this.modalType == 'edit') {
@@ -129,11 +128,17 @@ export default {
             }
         },
         storeProduct() {
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = '/cmsapi/configuration/products/store';
 
             axios.post(url, this.form)
             .then(res => {
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -144,7 +149,7 @@ export default {
                 $('#modalProductFormAddEdit').modal('hide');
                 this.clearForm();
             }).catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                 }else if(err.response.data.msg_error || err.response.data.message) {
@@ -159,11 +164,17 @@ export default {
             });
         },
         updateProduct() {
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = `/cmsapi/configuration/products/${this.form.id}/update`;
 
             axios.put(url, this.form)
             .then(res => {
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -174,7 +185,7 @@ export default {
                 $('#modalProductFormAddEdit').modal('hide');
                 this.clearForm();
             }).catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                 }else if(err.response.data.msg_error || err.response.data.message) {

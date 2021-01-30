@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" v-loading.fullscreen.lock="fullscreenLoading">
             <div class="container-fluid">
 
                 <div class="card card-info">
@@ -72,7 +72,7 @@
                                         <th>Total</th>
                                         <th>Vendedor</th>
                                         <th>Estado</th>
-                                        <th>Acciones</th>
+                                        <th class="text-nowrap text-center">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -86,18 +86,20 @@
                                             <span v-if="order.state == 'A'" class="badge badge-success">{{ order.state | orderState }}</span>
                                             <span v-else class="badge badge-danger">{{ order.state | orderState }}</span>
                                         </td>
-                                        <td>
-                                            <button v-if="authUserPermissions.includes('orders.show')" @click="generatePDF(order)"
-                                                class="btn btn-flat btn-info btn-xs" title="Ver PDF">
-                                                <i class="fas fa-file-pdf"></i>
-                                            </button>
-                                            <template v-if="order.state == 'A'">
-                                                <button v-if="authUserPermissions.includes('orders.reject')"
-                                                    @click="reject(order)"
-                                                    class="btn btn-flat btn-danger btn-xs" title="Rechazar">
-                                                    <i class="fas fa-trash"></i>
+                                        <td class="text-nowrap text-center">
+                                            <div>
+                                                <button v-if="authUserPermissions.includes('orders.show')" @click="generatePDF(order)"
+                                                    class="btn waves-effect waves-light btn-outline-primary btn-sm" title="Ver PDF">
+                                                    <i class="fas fa-file-pdf"></i>
                                                 </button>
-                                            </template>
+                                                <template v-if="order.state == 'A'">
+                                                    <button v-if="authUserPermissions.includes('orders.reject')"
+                                                        @click="reject(order)"
+                                                        class="btn waves-effect waves-light btn-outline-danger btn-sm" title="Rechazar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </template>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -153,27 +155,24 @@ export default {
                 document: '',
                 order: '',
                 state: ''
-            }
+            },
+
+            fullscreenLoading: false
         }
     },
 
     methods: {
         getOrders(page = 1) {
-            const loading = this.$vs.loading({
-                type: 'points',
-                color: 'blue',
-                // background: '#7a76cb',
-                text: 'Cargando...'
-            });
+            this.fullscreenLoading = true;
             const url = `/cmsapi/operation/orders?page=${page}`;
 
             axios.get(url, {
                 params: this.searches
             }).then(res => {
-                loading.close();
+                this.fullscreenLoading = false;
                 this.orders = res.data;
             }).catch(err => {
-                loading.close();
+                this.fullscreenLoading = false;
                 console.log(err.response.data);
             })
         },

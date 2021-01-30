@@ -170,7 +170,6 @@ export default {
             })
         },
         actionStoreUpdate() {
-            this.fullscreenLoading = true;
             switch (this.modalType) {
                 case 'add':
                     this.storeRole();
@@ -185,12 +184,19 @@ export default {
             //Obtengo los ids de los permisos asociado al rol
             let checkedIdPermissions = this.filterPermissions.filter(p_filter => p_filter.checked).map(p_map => p_map.id);
             const url = '/cmsapi/administration/roles/store';
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
+
             axios.post(url, {
                 name: this.form.name,
                 permissions: checkedIdPermissions
             })
             .then(res => {
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -202,7 +208,7 @@ export default {
                 this.clearForm();
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                     //Buscar los errores de los elementos del array permissions
@@ -228,12 +234,19 @@ export default {
         updateRole() {
             let checkedIdPermissions = this.filterPermissions.filter(p_filter => p_filter.checked).map(p_map => p_map.id);
             const url = `/cmsapi/administration/roles/${this.form.id}/update`;
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
+
             axios.put(url, {
                 name: this.form.name,
                 permissions: checkedIdPermissions
             }).then(res => {
                 EventBus.$emit('verifyAuthenticatedUser', null);
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -245,7 +258,7 @@ export default {
                 this.clearForm();
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                     //Buscar los errores de los elementos del array permissions

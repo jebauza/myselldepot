@@ -1,10 +1,7 @@
 <template>
 <div class="card">
 
-    <!-- Carga de datos -->
-    <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
-
-    <div v-if="user" class="card-body">
+    <div v-if="user" class="card-body" v-loading.fullscreen.lock="fullscreenLoading">
         <div class="row">
             <div class="col-md-4">
 
@@ -124,7 +121,7 @@
 
                                     <div class="form-group row">
                                         <div class="col-sm-12">
-                                            <button type="submit" class="btn btn-flat btn-info btnFull" v-loading.fullscreen.lock="fullscreenLoading">Guardar</button>
+                                            <button type="submit" class="btn btn-flat btn-info btnFull">Guardar</button>
                                         </div>
                                     </div>
                                 </form>
@@ -164,12 +161,11 @@ export default {
             errors: {},
 
             fullscreenLoading: false,
-            loaded: false
         }
     },
     methods: {
         getUserById() {
-            this.loaded = false;
+            this.fullscreenLoading = true;
             const url = `/cmsapi/administration/users/${this.$attrs.id}/show`;
             axios.get(url)
             .then(res => {
@@ -184,18 +180,17 @@ export default {
                     image: '',
                     id: this.user.id
                 };
-                this.loaded = true;
+                this.fullscreenLoading = false;
             })
             .catch(err => {
+                this.fullscreenLoading = false;
                 console.error(err);
-                this.loaded = true;
             })
         },
         getFile(e) {
             this.form.image = e.target.files[0];
         },
         updateUser() {
-            this.fullscreenLoading = true;
             const config = { headers: { 'content-type': 'multipart/form-data' } };
             let formData = new FormData;
             for (const property in this.form) {
@@ -204,7 +199,14 @@ export default {
                 }
             }
 
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = `/cmsapi/administration/users/${this.form.id}/update`;
+
             axios.post(url, formData, config)
             .then(res => {
                 this.user = res.data.user;
@@ -219,7 +221,7 @@ export default {
                     image: '',
                     id: this.user.id
                 };
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -229,7 +231,7 @@ export default {
 
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                 }else if(err.response.data.msg_error || err.response.data.message) {

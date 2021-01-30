@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <!-- Carga de datos -->
-        <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+        <!-- <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div> -->
 
         <div class="card-header">
             <div class="card-tools">
@@ -83,11 +83,13 @@
                                         <td v-text="product.price"></td>
                                         <td>{{ product.category ? product.category.name : '' }}</td>
 
-                                        <td>
-                                            <button v-if="authUserPermissions.includes('products.update')" @click="openModalAddEdit('edit', product)"
-                                                class="btn btn-flat btn-info btn-xs" title="Editar">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </button>
+                                        <td class="text-nowrap text-center">
+                                            <div>
+                                                <button v-if="authUserPermissions.includes('products.update')" @click="openModalAddEdit('edit', product)"
+                                                    class="btn waves-effect waves-light btn-outline-primary btn-sm" title="Editar">
+                                                    <i class="fas fa-pencil-alt"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -141,12 +143,11 @@ export default {
             },
 
             fullscreenLoading: false,
-            loaded: false
         }
     },
     methods: {
         getProducts(page = 1) {
-            this.loaded = false;
+            this.fullscreenLoading = true;
             const url = `/cmsapi/configuration/products?page=${page}`;
 
             const {name, description, categories} = this.searches;
@@ -159,8 +160,11 @@ export default {
             }).then(res => {
                 this.getAllCategories();
                 this.products = res.data;
-                this.loaded = true;
-            })
+                this.fullscreenLoading = false;
+            }).catch(err => {
+                this.fullscreenLoading = false;
+                console.log(err.response.data);
+            });
         },
         getAllCategories() {
             const url = `/cmsapi/configuration/categories/get-all-categories`;

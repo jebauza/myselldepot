@@ -9,16 +9,38 @@ use App\Http\Requests\CustomerStoreUpdateRequest;
 
 class CustomerCmsApiController extends Controller
 {
-    public function index()
+    /**
+     * index
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function index(Request $request)
     {
-        //
+        $customers = Customer::name($request->name)
+                        ->document($request->document)
+                        ->orderBy('name')
+                        ->paginate();
+
+        return response()->json($customers, 200);
     }
 
+    /**
+     * getAllCustomers
+     *
+     * @return void
+     */
     public function getAllCustomers()
     {
         return Customer::orderBy('name')->get();
     }
 
+    /**
+     * store
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
     public function store(CustomerStoreUpdateRequest $request)
     {
         $new_customer = new Customer($request->all());
@@ -49,9 +71,20 @@ class CustomerCmsApiController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(CustomerStoreUpdateRequest $request, $id)
     {
-        //
+        if(!$customer = Customer::find($id)){
+            return response()->json(['msg_error' => __('Not found')], 404);
+        }
+
+        $customer->fill($request->all());
+        $customer->created_by = $request->user()->id;
+        $customer->updated_by = $request->user()->id;
+        if($customer->save()) {
+            return response()->json(['msg'=>__('Save successfully'), 'customer' => $customer], 200);
+        }
+
+        return response()->json(['msg_error' => __('Internal Server Error')], 500);
     }
 
     /**

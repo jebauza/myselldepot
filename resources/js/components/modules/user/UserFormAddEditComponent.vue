@@ -197,7 +197,6 @@ export default {
             this.form.image = e.target.files[0];
         },
         actionStoreUpdate() {
-            this.fullscreenLoading = true;
             switch (this.modalType) {
                 case 'add':
                     this.storeUser();
@@ -224,10 +223,17 @@ export default {
                 }
             }
 
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = '/cmsapi/administration/users/store';
+
             axios.post(url, formData, config)
             .then(res => {
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -239,7 +245,7 @@ export default {
                 this.clearForm();
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                     this.errorsRolesPermissions();
@@ -270,11 +276,18 @@ export default {
                 }
             }
 
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = `/cmsapi/administration/users/${this.form.id}/update`;
+
             axios.post(url, formData, config)
             .then(res => {
                 EventBus.$emit('verifyAuthenticatedUser', res.data.user);
-                this.fullscreenLoading = false;
+                loading.close();
                 Swal.fire({
                     title: res.data.msg,
                     icon: "success",
@@ -286,7 +299,7 @@ export default {
                 this.clearForm();
             })
             .catch(err => {
-                this.fullscreenLoading = false;
+                loading.close();
                 if(err.response && err.response.status == 422) {
                     this.errors = err.response.data.errors;
                     this.errorsRolesPermissions();

@@ -1,7 +1,5 @@
 <template>
     <div class="card">
-        <!-- Carga de datos -->
-        <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
 
         <div class="card-header">
             <div class="card-tools">
@@ -12,7 +10,7 @@
             </div>
         </div>
 
-        <div class="card-body">
+        <div class="card-body" v-loading.fullscreen.lock="fullscreenLoading">
             <div class="container-fluid">
 
                 <div class="card card-info">
@@ -58,7 +56,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr v-for="(role, index) in roles.data" :key="role.id">
+                                    <tr v-for="(role, index) in roles.data" :key="index">
                                         <td>{{ role.name }}</td>
                                         <td>
                                             <button v-if="authUserPermissions.includes('roles.show')" @click="openModalAddEdit('show', role)"
@@ -111,19 +109,22 @@ export default {
                 name: ''
             },
 
-            loaded: false
+            fullscreenLoading: false
         }
     },
     methods: {
         getRoles(page = 1) {
-            this.loaded = false;
+            this.fullscreenLoading = true;
             const url = `/cmsapi/administration/roles?page=${page}`;
             axios.get(url, {
                 params: this.searches
             }).then(res => {
                 this.roles = res.data;
-                this.loaded = true;
-            })
+                this.fullscreenLoading = false;
+            }).catch(err => {
+                this.fullscreenLoading = false;
+                console.log(err.response.data);
+            });
         },
         clearSearches() {
             this.searches = {

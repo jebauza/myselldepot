@@ -75,8 +75,10 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
 
         /* CUSTOMERS */
         Route::prefix('customers')->name('customers.')->group(function () {
-            Route::get('/get-all-customers', 'CMS\Api\CustomerCmsApiController@getAllCustomers')->name('get-customers');
+            Route::get('/', 'CMS\Api\CustomerCmsApiController@index')->middleware('permission:customers.index')->name('index');
+            Route::get('/get-all-customers', 'CMS\Api\CustomerCmsApiController@getAllCustomers')->middleware('permission:orders.store')->name('get-all-customers');
             Route::post('/store', 'CMS\Api\CustomerCmsApiController@store')->middleware('permission:customers.store')->name('store');
+            Route::put('/{customer_id}/update', 'CMS\Api\CustomerCmsApiController@update')->middleware('permission:customers.update')->name('update');
         });
     });
 });

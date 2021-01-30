@@ -12,6 +12,12 @@ use App\Http\Requests\OrderStoreUpdateRequest;
 
 class OrderCmsApiController extends Controller
 {
+    /**
+     * index
+     *
+     * @param  Request $request
+     * @return json
+     */
     public function index(Request $request)
     {
         $orders = Order::customerName($request->name)
@@ -22,9 +28,15 @@ class OrderCmsApiController extends Controller
                         ->orderBy('order_number', 'DESC')
                         ->paginate();
 
-        return $orders;
+        return response()->json($orders, 200);
     }
 
+    /**
+     * store
+     *
+     * @param  Request $request
+     * @return json
+     */
     public function store(OrderStoreUpdateRequest $request)
     {
         $order_number = Carbon::today()->format('Ymd').'_'.(Order::whereDate('created_at', Carbon::today())->count() + 1);
@@ -114,7 +126,7 @@ class OrderCmsApiController extends Controller
      * reject
      *
      * @param  int $id
-     * @return void
+     * @return json
      */
     public function reject($id)
     {

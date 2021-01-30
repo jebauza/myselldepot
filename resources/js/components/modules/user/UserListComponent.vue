@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <!-- Carga de datos -->
-        <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+        <!-- <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div> -->
 
         <div class="card-header">
             <div v-if="authUserPermissions.includes('users.store')" class="card-tools">
@@ -161,20 +161,23 @@ export default {
                 state: '',
             },
 
-            fullscreenLoading: false,
-            loaded: false
+            fullscreenLoading: false
         }
     },
     methods: {
         getUsers(page = 1) {
-            this.loaded = false;
+            this.fullscreenLoading = true;
             const url = `/cmsapi/administration/users?page=${page}`;
+
             axios.get(url, {
                 params: this.searches
             }).then(res => {
                 this.users = res.data;
-                this.loaded = true;
-            })
+                this.fullscreenLoading = false;
+            }).catch(err => {
+                this.fullscreenLoading = false;
+                console.log(err.response.data);
+            });
         },
         clearSearches() {
             this.searches = {
@@ -200,13 +203,19 @@ export default {
                 confirmButtonText: (newState == 'I' ? 'Si, desactivar' : 'Si, activar')
             }).then((result) => {
                 if (result.isConfirmed) {
-                    this.fullscreenLoading = true;
+                    const loading = this.$vs.loading({
+                        type: 'points',
+                        color: 'blue',
+                        // background: '#7a76cb',
+                        text: 'Cargando...'
+                    });
                     const url = `/cmsapi/administration/users/${user.id}/set-state`;
+
                     axios.put(url,{
                         state: newState
                     })
                     .then(res => {
-                        this.fullscreenLoading = false;
+                        loading.close();
                         Swal.fire({
                             title: res.data.msg,
                             icon: "success",
@@ -216,7 +225,7 @@ export default {
                         this.updateUserList();
                     })
                     .catch(err => {
-                        this.fullscreenLoading = false;
+                        loading.close();
                         if(err.response.data.msg_error || err.response.data.message)
                         {
                             Swal.fire({
@@ -228,7 +237,7 @@ export default {
                             });
                         }
                         console.log(err.response.data);
-                    })
+                    });
                 }
             });
         }
