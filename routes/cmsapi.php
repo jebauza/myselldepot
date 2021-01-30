@@ -69,6 +69,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::get('/', 'CMS\Api\OrderCmsApiController@index')->middleware('permission:orders.index')->name('index');
             Route::post('/store', 'CMS\Api\OrderCmsApiController@store')->middleware('permission:orders.store')->name('store');
             Route::put('/{order_id}/update', 'CMS\Api\OrderCmsApiController@update')->middleware('permission:orders.update')->name('update');
+            Route::post('/{order_id}/generate-pdf', 'CMS\Api\OrderCmsApiController@generatePDF')->middleware('permission:orders.update')->name('generate-pdf');
         });
 
         /* CUSTOMERS */

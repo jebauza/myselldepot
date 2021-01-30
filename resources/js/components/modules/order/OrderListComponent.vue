@@ -1,7 +1,7 @@
 <template>
     <div class="card">
         <!-- Carga de datos -->
-        <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div>
+        <!-- <div v-if="!loaded" class="overlay"><i class="fas fa-2x fa-sync-alt fa-spin"></i></div> -->
 
         <div class="card-header">
             <div class="card-tools">
@@ -12,7 +12,7 @@
             </div>
         </div>
 
-        <div class="card-body" v-loading.fullscreen.lock="fullscreenLoading">
+        <div class="card-body">
             <div class="container-fluid">
 
                 <div class="card card-info">
@@ -79,12 +79,12 @@
                                     <tr v-for="(order) in orders.data" :key="order.id">
                                         <td v-text="order.order_number"></td>
                                         <td v-text="order.customer.document"></td>
-                                        <td>{{`${order.customer.name} ${order.customer.lastname}`}}</td>
+                                        <td>{{order.customer.fullName}}</td>
                                         <td v-text="order.total"></td>
                                         <td v-text="order.seller.fullName"></td>
                                         <td v-text="order.state"></td>
                                         <td>
-                                            <button v-if="authUserPermissions.includes('orders.show')"
+                                            <button v-if="authUserPermissions.includes('orders.show')" @click="generatePDF(order)"
                                                 class="btn btn-flat btn-info btn-xs" title="Ver PDF">
                                                 <i class="fas fa-file-pdf"></i>
                                             </button>
@@ -104,7 +104,7 @@
                     </div>
                 </div>
 
-                <order-form-add-edit ref="orderFormAddEdit" @updateOrderList="updateOrderList"></order-form-add-edit>
+                <order-form-add-edit ref="orderFormAddEdit" @updateOrderList="updateOrderList" @generatePDF="generatePDF"></order-form-add-edit>
 
             </div>
 
@@ -145,22 +145,27 @@ export default {
                 document: '',
                 order: '',
                 state: ''
-            },
-
-            fullscreenLoading: false,
-            loaded: false
+            }
         }
     },
     methods: {
         getOrders(page = 1) {
-            this.loaded = false;
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
             const url = `/cmsapi/operation/orders?page=${page}`;
 
             axios.get(url, {
                 params: this.searches
             }).then(res => {
+                loading.close();
                 this.orders = res.data;
-                this.loaded = true;
+            }).catch(err => {
+                loading.close();
+                console.log(err.response.data);
             })
         },
         clearSearches() {
@@ -177,7 +182,39 @@ export default {
         updateOrderList(action = null) {
             this.getOrders(this.orders.current_page ?? 1 );
         },
+        generatePDF(order) {
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
+            const url = `/cmsapi/operation/orders/${order.id}/generate-pdf`;
+            const config = {
+                responseType: 'blob'
+            };
 
+            axios.post(url, {}, config)
+            .then(res => {
+                loading.close();
+                const blob = new Blob([res.data], {type : 'application/pdf'}); // the blob
+                const urlPDF = URL.createObjectURL(blob);
+                window.open(urlPDF);
+            })
+            .catch(err => {
+                loading.close();
+                if(err.response.data.msg_error || err.response.data.message) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: err.response.data.msg_error ?? err.response.data.message,
+                        icon: "error",
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
+                    });
+                }
+                console.error(err);
+            })
+        }
     },
 
     computed: {

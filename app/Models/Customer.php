@@ -11,6 +11,14 @@ class Customer extends Model
 
     protected $fillable = ['name', 'lastname', 'document', 'phone', 'email'];
 
+    protected $appends = ['fullName'];
+
+    //Attributes
+    function getFullNameAttribute()
+    {
+        return $this->name .' '. $this->lastname;
+    }
+
     //Scopes
     public function scopeName($query, $name)
     {

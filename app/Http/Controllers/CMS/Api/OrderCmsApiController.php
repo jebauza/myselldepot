@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CMS\Api;
 
 use Carbon\Carbon;
 use App\Models\Order;
+use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
@@ -89,5 +90,23 @@ class OrderCmsApiController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    /**
+     * generatePDF
+     *
+     * @param  mixed $id
+     * @return void
+     */
+    public function generatePDF($id)
+    {
+        if (!$order = Order::with('customer','seller','products')->find($id)) {
+            return response()->json(['msg_error' => __('Not found')], 404);
+        }
+
+        $logo = public_path('img/AdminLTELogo.png');
+
+        $pdf = PDF::loadView('reports.order.pdf.orderPDF', ['order' => $order, 'logo' => $logo]);
+        return $pdf->download( "$order->order_number.pdf");
     }
 }
