@@ -95,8 +95,8 @@ class OrderCmsApiController extends Controller
     /**
      * generatePDF
      *
-     * @param  mixed $id
-     * @return void
+     * @param  int $id
+     * @return download PDF
      */
     public function generatePDF($id)
     {
@@ -108,5 +108,23 @@ class OrderCmsApiController extends Controller
 
         $pdf = PDF::loadView('reports.order.pdf.orderPDF', ['order' => $order, 'logo' => $logo]);
         return $pdf->download( "$order->order_number.pdf");
+    }
+
+    /**
+     * reject
+     *
+     * @param  int $id
+     * @return void
+     */
+    public function reject($id)
+    {
+        if (!$order = Order::find($id)) {
+            return response()->json(['msg_error' => __('Not found')], 404);
+        }
+
+        $order->state = 'I';
+        $order->save();
+
+        return response()->json(['msg'=>__('Save successfully'), 'order'=>$order], 200);
     }
 }

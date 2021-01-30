@@ -34,8 +34,8 @@
                                 <label class="control-label">Estado</label>
                                 <select v-model="searches.state" class="form-control" >
                                     <option value=""></option>
-                                    <option value="A">Activo</option>
-                                    <option value="I">Inactivo</option>
+                                    <option value="A">ACTIVO</option>
+                                    <option value="I">RECHAZADO</option>
                                 </select>
                             </div>
                             <div class="form-group col-9 col-sm-7 col-md-11 col-lg-3">
@@ -82,16 +82,22 @@
                                         <td>{{order.customer.fullName}}</td>
                                         <td v-text="order.total"></td>
                                         <td v-text="order.seller.fullName"></td>
-                                        <td v-text="order.state"></td>
+                                        <td>
+                                            <span v-if="order.state == 'A'" class="badge badge-success">{{ order.state | orderState }}</span>
+                                            <span v-else class="badge badge-danger">{{ order.state | orderState }}</span>
+                                        </td>
                                         <td>
                                             <button v-if="authUserPermissions.includes('orders.show')" @click="generatePDF(order)"
                                                 class="btn btn-flat btn-info btn-xs" title="Ver PDF">
                                                 <i class="fas fa-file-pdf"></i>
                                             </button>
-                                            <button v-if="authUserPermissions.includes('orders.reject')"
-                                                class="btn btn-flat btn-danger btn-xs" title="Rechazar">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
+                                            <template v-if="order.state == 'A'">
+                                                <button v-if="authUserPermissions.includes('orders.reject')"
+                                                    @click="reject(order)"
+                                                    class="btn btn-flat btn-danger btn-xs" title="Rechazar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </template>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -118,9 +124,11 @@ import OrderFormAddEdit from './OrderFormAddEditComponent';
 
 export default {
     components: {OrderFormAddEdit},
+
     created() {
         this.getOrders();
     },
+
     watch: {
         'searches.name': function (newValue, oldValue) {
             this.getOrders();
@@ -135,11 +143,11 @@ export default {
             this.getOrders();
         }
     },
+
     data() {
         return {
             orders: {data:[]},
 
-            //allCategories: [],
             searches: {
                 name: '',
                 document: '',
@@ -148,6 +156,7 @@ export default {
             }
         }
     },
+
     methods: {
         getOrders(page = 1) {
             const loading = this.$vs.loading({
@@ -214,6 +223,44 @@ export default {
                 }
                 console.error(err);
             })
+        },
+        reject(order) {
+            const loading = this.$vs.loading({
+                type: 'points',
+                color: 'blue',
+                // background: '#7a76cb',
+                text: 'Cargando...'
+            });
+            const url = `/cmsapi/operation/orders/${order.id}/reject`;
+
+            axios.put(url)
+            .then(res => {
+                loading.close();
+                Swal.fire({
+                    title: res.data.msg,
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+                this.updateOrderList();
+            })
+            .catch(err => {
+                loading.close();
+                if(err.response.data.msg_error || err.response.data.message) {
+                     msg_error = err.response.data.msg_error ?? err.response.data.message;
+                }
+
+                if (msg_error) {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: msg_error,
+                        icon: "error",
+                        showCloseButton: true,
+                        closeButtonColor: 'red',
+                    });
+                }
+                console.error(err);
+            });
         }
     },
 
@@ -222,6 +269,24 @@ export default {
             return JSON.parse(sessionStorage.getItem('listPermissionsByAuthUser'));
         }
     },
+
+    filters: {
+        orderState(state) {
+            switch (state) {
+                case 'A':
+                    return 'ACTIVO';
+                    break;
+
+                case 'I':
+                    return 'RECHAZADO';
+                    break;
+
+                default:
+                    return '';
+                    break;
+            }
+        }
+    }
 
 }
 </script>
