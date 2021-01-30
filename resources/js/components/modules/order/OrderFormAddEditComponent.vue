@@ -429,6 +429,7 @@ export default {
                     timer: 1500,
                     showConfirmButton: false
                 });
+                this.$emit('generatePDF', res.data.order);
                 $('#modalOrderFormAddEdit').modal('hide');
                 this.clearFormCustomer();
                 this.clearProducts();
@@ -436,7 +437,6 @@ export default {
                 this.fullscreenLoading = false;
                 let msg_error = null;
                 if(err.response && err.response.status == 422) {
-
                     this.errors = err.response.data.errors;
                     msg_error = this.errors.msg_error_validator ? this.errors.msg_error_validator[0] : null;
                 } else if(err.response.data.msg_error || err.response.data.message) {
