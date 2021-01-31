@@ -12,7 +12,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
     });
 
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
-        Route::get('/chart/product-sales-ranking', 'CMS\Api\DashboardApiController@getProductSalesRanking')->name('chart.product-sales-ranking');
+        Route::get('/chart/product-sales-ranking', 'CMS\Api\DashboardApiController@getProductSalesRanking')->middleware('permission:products.most-selled')->name('chart.product-sales-ranking');
     });
 
 

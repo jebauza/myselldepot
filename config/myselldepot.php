@@ -28,6 +28,7 @@ return [
         ['name' => 'products.store', 'display_name' => 'Crear Producto'],
         ['name' => 'products.show', 'display_name' => 'Ver Producto'],
         ['name' => 'products.update', 'display_name' => 'Modificar Producto'],
+        ['name' => 'products.most-selled', 'display_name' => 'Productos más vendidos'],
 
         /* Orders */
         ['name' => 'orders.index', 'display_name' => 'Navegar Pedidos'],
