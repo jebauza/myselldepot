@@ -11,6 +11,11 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
         Route::get('/get-refresh-auth-user', 'CMS\Api\Auth\LoginCmsApiController@refreshUserAuth')->name('get-refresh-auth-user');
     });
 
+    Route::prefix('dashboard')->name('dashboard.')->group(function () {
+        Route::get('/chart/product-sales-ranking', 'CMS\Api\DashboardApiController@getProductSalesRanking')->name('chart.product-sales-ranking');
+    });
+
+
     /* ADMINISTRATION */
     Route::prefix('administration')->group(function () {
 
