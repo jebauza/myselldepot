@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\CMS\Api;
 
+use PDF;
 use Carbon\Carbon;
 use App\Models\Order;
-use PDF;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\Order\NewOrderCustomerMail;
 use App\Http\Requests\OrderStoreUpdateRequest;
 
 class OrderCmsApiController extends Controller
@@ -61,6 +63,10 @@ class OrderCmsApiController extends Controller
                 }
 
                 DB::commit();
+                if ($customerEmail = $new_order->customer->email) {
+                    Mail::to($customerEmail)->send(new NewOrderCustomerMail($new_order));
+                }
+
                 return response()->json(['msg'=>__('Save successfully'), 'order'=>$new_order], 201);
             }
 
