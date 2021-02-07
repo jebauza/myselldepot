@@ -46,6 +46,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .selected{
+        background-color: #7FFFD466;
+    }
 </style>

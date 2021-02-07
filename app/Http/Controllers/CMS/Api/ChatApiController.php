@@ -36,11 +36,11 @@ class ChatApiController extends Controller
     {
         $currentUser = $request->user();
         if (!$contact = User::find($contact_id)) {
-
+            return response()->json(['msg_error' => __('Not found')], 404);
         }
 
         $messages = Message::fromAndTo($currentUser->id, $contact->id)
-                            ->with('fromUser', 'toUser')
+                            ->with('fromUser.profileImage', 'toUser.profileImage')
                             ->oldest()
                             ->get();
 

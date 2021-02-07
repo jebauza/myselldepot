@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\User;
+use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class Message extends Model
@@ -10,6 +11,11 @@ class Message extends Model
     protected $table = 'messages';
 
     protected $fillable = ['from', 'to', 'read', 'text'];
+
+    protected function serializeDate(DateTimeInterface $date)
+    {
+        return $date->format('Y-m-d H:i:s');
+    }
 
     //Scopes
     public function scopeFromAndTo($query, $from_id, $to_id)

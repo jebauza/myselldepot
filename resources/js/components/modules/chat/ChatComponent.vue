@@ -1,5 +1,5 @@
 <template>
-    <div class="card direct-chat direct-chat-primary">
+    <div class="card direct-chat direct-chat-primary" :class="openAndCloseContacts ? 'direct-chat-contacts-open' : ''">
         <div class="card-header ui-sortable-handle" style="cursor: move;">
             <h3 class="card-title">Mensajes Instantaneos</h3>
 
@@ -8,17 +8,14 @@
                 <button type="button" class="btn btn-tool" data-card-widget="collapse">
                     <i class="fas fa-minus"></i>
                 </button>
-                <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts" data-widget="chat-pane-toggle">
+                <button type="button" class="btn btn-tool" data-toggle="tooltip" title="Contacts" @click.prevent="openAndCloseContacts = !openAndCloseContacts">
                     <i class="fas fa-comments"></i>
-                </button>
-                <button type="button" class="btn btn-tool" data-card-widget="remove">
-                    <i class="fas fa-times"></i>
                 </button>
             </div>
         </div>
         <!-- /.card-header -->
         <div class="card-body">
-            <Conversation></Conversation>
+            <Conversation ref="conversation" :messages="messages" :contact="selectedContact"></Conversation>
 
             <ContactList :contacts="contacts" @contactSelect="getMessages"></ContactList>
         </div>
@@ -44,7 +41,9 @@ export default {
     data() {
         return {
             contacts: [],
-            messages: []
+            messages: [],
+            selectedContact: null,
+            openAndCloseContacts: false
         }
     },
 
@@ -66,13 +65,23 @@ export default {
         },
 
         getMessages(user) {
+            this.selectedContact = user;
+            this.messages = [];
+            this.openAndCloseContacts = false;
+
             const url = `cmsapi/chat/${user.id}/messages`;
+            const loading = this.$vs.loading({
+                target: this.$refs.conversation,
+                color: 'dark'
+            });
 
             axios.get(url)
             .then(res => {
-                console.log(res)
+                loading.close();
+                this.messages = res.data;
             })
             .catch(err => {
+                loading.close();
                 console.error(err);
             });
         }

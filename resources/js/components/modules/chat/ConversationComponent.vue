@@ -1,76 +1,86 @@
 <template>
     <div class="direct-chat-messages">
-        <!-- Message. Default to the left -->
-        <div class="direct-chat-msg">
-            <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-left">Alexander Pierce</span>
-                <span class="direct-chat-timestamp float-right">23 Jan 2:00 pm</span>
-            </div>
-            <!-- /.direct-chat-infos -->
-            <img class="direct-chat-img" src="/img/user1-128x128.jpg" alt="message user image">
-            <!-- /.direct-chat-img -->
-            <div class="direct-chat-text">
-                Is this template really for free? That's unbelievable!
-            </div>
-            <!-- /.direct-chat-text -->
-        </div>
-        <!-- /.direct-chat-msg -->
 
-        <!-- Message to the right -->
-        <div class="direct-chat-msg right">
-            <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-right">Sarah Bullock</span>
-                <span class="direct-chat-timestamp float-left">23 Jan 2:05 pm</span>
-            </div>
-            <!-- /.direct-chat-infos -->
-            <img class="direct-chat-img" src="/img/user3-128x128.jpg" alt="message user image">
-            <!-- /.direct-chat-img -->
-            <div class="direct-chat-text">
-                You better believe it!
-            </div>
-            <!-- /.direct-chat-text -->
-        </div>
-        <!-- /.direct-chat-msg -->
+        <template v-if="contact">
 
-        <!-- Message. Default to the left -->
-        <div class="direct-chat-msg">
-            <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-left">Alexander Pierce</span>
-                <span class="direct-chat-timestamp float-right">23 Jan 5:37 pm</span>
-            </div>
-            <!-- /.direct-chat-infos -->
-            <img class="direct-chat-img" src="/img/user1-128x128.jpg" alt="message user image">
-            <!-- /.direct-chat-img -->
-            <div class="direct-chat-text">
-                Working with AdminLTE on a great new app! Wanna join?
-            </div>
-            <!-- /.direct-chat-text -->
-        </div>
-        <!-- /.direct-chat-msg -->
+            <template v-if="messages.length > 0">
+                <div v-for="(message, index) in messages" :key="index" class="direct-chat-msg " :class="message.from == contact.id ? '' : 'right'">
+                    <div class="direct-chat-infos clearfix">
+                        <span class="direct-chat-name " :class="message.from == contact.id ? 'float-left' : 'float-right'">{{ getMessageData(message, 'fullName') }}</span>
+                        <span class="direct-chat-timestamp " :class="message.from == contact.id ? 'float-right' : 'float-left'">{{ getMessageData(message, 'created_at') }}</span>
+                    </div>
+                    <img class="direct-chat-img" :src="getMessageData(message, 'url_img')" :alt="getMessageData(message, 'fullName')">
+                    <div class="direct-chat-text">
+                        {{ message.text }}
+                    </div>
+                </div>
+            </template>
+            <template v-else>
+                <vs-alert shadow >
+                    <template #title>
+                        Comienza a excribirle a {{ contact.fullName }}
+                    </template>
+                </vs-alert>
+            </template>
 
-        <!-- Message to the right -->
-        <div class="direct-chat-msg right">
-            <div class="direct-chat-infos clearfix">
-                <span class="direct-chat-name float-right">Sarah Bullock</span>
-                <span class="direct-chat-timestamp float-left">23 Jan 6:10 pm</span>
-            </div>
-            <!-- /.direct-chat-infos -->
-            <img class="direct-chat-img" src="/img/user3-128x128.jpg" alt="message user image">
-            <!-- /.direct-chat-img -->
-            <div class="direct-chat-text">
-                I would love to.
-            </div>
-            <!-- /.direct-chat-text -->
-        </div>
-        <!-- /.direct-chat-msg -->
+        </template>
+        <template v-else>
+            <vs-alert shadow >
+                <template #title>
+                    Mensaje
+                </template>
+                Debe seleccionar un contacto para iniciar una conversacion.
+            </vs-alert>
+        </template>
+
 
     </div>
 </template>
 
 <script>
+import moment from 'moment';
+
 export default {
+    props: {
+        messages: {
+            type: Array,
+            default: []
+        },
+        contact: {
+            type: Object,
+            default: null
+        }
+    },
+
     data() {
         return {
+
+        }
+    },
+
+    methods: {
+        getMessageData(message, data) {
+            if (!message) {
+                return '';
+            }
+
+            switch (data) {
+                case 'fullName':
+                    return message.from_user.fullName || '';
+                    break;
+
+                case 'created_at':
+                    return moment(message.created_at, 'YYYY-MM-DD HH:mm:ss').format('lll');
+                    break;
+
+                case 'url_img':
+                    return (message.from_user.profile_image && message.from_user.profile_image.url) ? message.from_user.profile_image.url : '/img/user3-128x128.jpg';
+                    break;
+
+                default:
+                    return '';
+                    break;
+            }
 
         }
     },
