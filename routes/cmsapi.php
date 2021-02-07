@@ -86,5 +86,10 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
             Route::put('/{customer_id}/update', 'CMS\Api\CustomerCmsApiController@update')->middleware('permission:customers.update')->name('update');
         });
     });
+
+    Route::prefix('chat')->name('chat.')->group(function () {
+        Route::get('/contacts', 'CMS\Api\ChatApiController@getContacts')->name('contacts');
+        Route::get('/{contact_id}/messages', 'CMS\Api\ChatApiController@getMessages')->name('messages');
+    });
 });
 
