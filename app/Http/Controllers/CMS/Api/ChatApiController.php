@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers\CMS\Api;
 
-use App\Http\Controllers\Controller;
-use App\Models\Message;
 use App\User;
+use App\Models\Message;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Events\Message\NewMessageEvent;
 
 class ChatApiController extends Controller
 {
@@ -53,9 +54,21 @@ class ChatApiController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function sendMessage(Request $request)
     {
-        //
+        $request->validate([
+            'contact' => 'required|integer|exists:users,id',
+            'text' => 'required|string'
+        ]);
+
+        $newMessage = Message::create([
+            'from' => $request->user()->id,
+            'to' => $request->contact,
+            'text' => $request->text
+        ]);
+
+        //broadcast(new NewMessageEvent($newMessage));  // ->toOthers();
+        return response()->json($newMessage->loadWithFromAndTo(), 201);
     }
 
     /**

@@ -11,6 +11,13 @@
 
 <script>
 export default {
+    props: {
+        contact: {
+            type: Object,
+            default: null
+        }
+    },
+
     data() {
         return {
             message: ''
@@ -20,12 +27,22 @@ export default {
 
     methods: {
         sendMessage() {
-            if (!this.message) {
+            if (!this.message || !this.contact) {
                 return;
             }
 
-            this.$emit('message', this.message);
-            this.message = '';
+            const url = '/cmsapi/chat/send-message';
+            axios.post(url, {
+                contact: this.contact.id,
+                text: this.message
+            })
+            .then(res => {
+                this.$emit('new_message', res.data);
+                this.message = '';
+            })
+            .catch(err => {
+                console.error(err);
+            });
         }
     },
 

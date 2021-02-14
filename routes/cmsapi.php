@@ -12,7 +12,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
     });
 
     Route::prefix('dashboard')->name('dashboard.')->group(function () {
-        Route::get('/chart/product-sales-ranking', 'CMS\Api\DashboardApiController@getProductSalesRanking')->middleware('permission:products.most-selled')->name('chart.product-sales-ranking');
+        Route::get('/chart/product-sales-ranking', 'CMS\Api\DashboardApiController@getProductSalesRanking')/* ->middleware('permission:products.most-selled') */->name('chart.product-sales-ranking');
     });
 
 
@@ -90,6 +90,7 @@ Route::middleware(['ajax', 'auth'])->name('cmsapi.')->group(function () {
     Route::prefix('chat')->name('chat.')->group(function () {
         Route::get('/contacts', 'CMS\Api\ChatApiController@getContacts')->name('contacts');
         Route::get('/{contact_id}/messages', 'CMS\Api\ChatApiController@getMessages')->name('messages');
+        Route::post('/send-message', 'CMS\Api\ChatApiController@sendMessage')->name('send-message');
     });
 });
 

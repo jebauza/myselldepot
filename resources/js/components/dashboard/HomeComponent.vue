@@ -93,13 +93,13 @@
         <div class="card-body" >
             <div class="container-fluid">
 
-                <Graphic></Graphic>
+                <!-- <Graphic></Graphic> -->
 
                  <!-- DIRECT CHAT -->
                 <div class="row">
                     <div class="col-md-6">
 
-                        <Chat></Chat>
+                        <Chat :user="authUser"></Chat>
 
                     </div>
                 </div>
@@ -124,7 +124,7 @@ export default {
 
     data() {
         return {
-
+            authUser: JSON.parse(sessionStorage.getItem('authUser'))
         }
     },
 

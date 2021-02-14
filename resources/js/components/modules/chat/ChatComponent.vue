@@ -20,7 +20,7 @@
             <ContactList :contacts="contacts" @contactSelect="getMessages"></ContactList>
         </div>
         <div class="card-footer">
-            <SendMessage @message="newMessage"></SendMessage>
+            <SendMessage @new_message="newMessage" :contact="selectedContact"></SendMessage>
         </div>
 
     </div>
@@ -34,7 +34,14 @@ import SendMessage from './SendMessageComponent';
 export default {
     components: {ContactList, Conversation, SendMessage},
 
+    props: ['user'],
+
     mounted() {
+        Echo.private(`message.${this.user.id}`)
+            .listen('.new.message', (e) => {
+                console.log(e);
+            });
+
         this.getContactList();
     },
 
@@ -59,29 +66,27 @@ export default {
                 console.error(err);
             })
         },
-
         newMessage(message) {
-            console.log(message);
+            this.messages.push(message);
         },
-
         getMessages(user) {
             this.selectedContact = user;
             this.messages = [];
             this.openAndCloseContacts = false;
 
             const url = `cmsapi/chat/${user.id}/messages`;
-            const loading = this.$vs.loading({
+            /* const loading = this.$vs.loading({
                 target: this.$refs.conversation,
                 color: 'dark'
-            });
+            }); */
 
             axios.get(url)
             .then(res => {
-                loading.close();
+                // loading.close();
                 this.messages = res.data;
             })
             .catch(err => {
-                loading.close();
+                // loading.close();
                 console.error(err);
             });
         }

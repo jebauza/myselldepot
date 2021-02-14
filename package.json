@@ -26,8 +26,10 @@
     "dependencies": {
         "chart.js": "^2.9.4",
         "element-ui": "^2.13.2",
+        "laravel-echo": "^1.10.0",
         "laravel-vue-pagination": "^2.3.1",
         "moment": "^2.29.0",
+        "pusher-js": "^7.0.3",
         "sweetalert2": "^10.3.3",
         "vue-full-calendar": "^2.7.0",
         "vue-multiselect": "^2.1.6",

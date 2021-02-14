@@ -1,5 +1,5 @@
 <template>
-    <div class="direct-chat-messages">
+    <div class="direct-chat-messages" ref="bottom">
 
         <template v-if="contact">
 
@@ -52,6 +52,15 @@ export default {
         }
     },
 
+    watch: {
+        messages() {
+            this.scrollToBottom();
+        },
+        contact() {
+            this.scrollToBottom();
+        },
+    },
+
     data() {
         return {
 
@@ -81,7 +90,11 @@ export default {
                     return '';
                     break;
             }
-
+        },
+        scrollToBottom() {
+            setTimeout(() => {
+                this.$refs.bottom.scrollTop = this.$refs.bottom.scrollHeight - this.$refs.bottom.clientHeight;
+            }, 100);
         }
     },
 }
